@@ -21,7 +21,7 @@ complete or blocked.
 - Technical lead: hybrid session (Claude Code + Codex)
 - Governance level: 1
 - Risk tier: low
-- Production status: Chunk One draft spike complete - desktop shell not yet started
+- Production status: Chunk Two draft complete - signal detector not yet started
 - Planned public repo name: `perpetual-context-protection-automation`
 
 ## Quick Start
@@ -34,6 +34,8 @@ nvm use --silent
 npm install
 npm run lint
 npm test
+npm run build
+npm run desktop:smoke
 npm run test:vscode
 ```
 
@@ -41,9 +43,18 @@ Use `docs/current-build-pathway.md` as the active implementation route. The
 original tmux/n8n research plan in `PLAN.md` is retained as superseded research,
 not the current build path.
 
-The first implementation slice proves the VS Code extension can start in an
-extension host, send heartbeats to a localhost bridge, request a managed Codex
-PTY session, and read/write a bridge-owned managed terminal.
+The current implementation includes the VS Code companion extension, localhost
+bridge, managed PTY session path, and Electron desktop shell. The desktop app
+renders bridge-backed session cards, append-only logs, and guarded operator
+actions where candidate sessions remain visible but cannot be armed unattended.
+
+Launch the draft desktop shell locally with:
+
+```bash
+source /home/adamgoodwin/.nvm/nvm.sh
+nvm use --silent
+npm run desktop:launch
+```
 
 ## Key Files
 

@@ -8,6 +8,26 @@ export type ObservabilityLevel =
   | "candidate"
   | "unsupported";
 
+export type SessionAutomationState = "idle" | "armed" | "paused";
+
+export type SessionCardStatus =
+  | "detected"
+  | "starting"
+  | "running"
+  | "exited"
+  | "armed"
+  | "paused"
+  | "unsupported";
+
+export type DesktopEventKind =
+  | "heartbeat"
+  | "session-started"
+  | "session-input"
+  | "session-armed"
+  | "session-paused"
+  | "session-dismissed"
+  | "arm-all";
+
 export interface WorkspaceIdentity {
   id: string;
   name: string;
@@ -54,6 +74,62 @@ export interface BridgeSessionSummary {
   command: string;
   outputLength: number;
   exitCode?: number;
+}
+
+export interface DesktopConnectionSummary {
+  bridgeOnline: boolean;
+  heartbeatCount: number;
+  sessionCount: number;
+  lastHeartbeatAt?: string;
+}
+
+export interface DesktopSessionCard {
+  id: string;
+  source: "managed-session" | "heartbeat-terminal" | "workspace";
+  workspaceId: string;
+  workspaceName: string;
+  windowId?: string;
+  agentLabel: string;
+  profileId?: AgentProfileId;
+  observability: ObservabilityLevel;
+  status: SessionCardStatus;
+  automationState: SessionAutomationState;
+  canArm: boolean;
+  canArmAll: boolean;
+  reason: string;
+  lastEvent: string;
+  lastEventAt: string;
+  chunkCount: number;
+}
+
+export interface DesktopEventLogEntry {
+  id: string;
+  timestamp: string;
+  kind: DesktopEventKind;
+  message: string;
+  cardId?: string;
+  workspaceId?: string;
+  affectedCardIds?: string[];
+}
+
+export interface DesktopStateResponse {
+  protocolVersion: typeof PROTOCOL_VERSION;
+  generatedAt: string;
+  connection: DesktopConnectionSummary;
+  cards: DesktopSessionCard[];
+  events: DesktopEventLogEntry[];
+  profiles: Array<{
+    id: AgentProfileId;
+    displayName: string;
+    compactCommand: string;
+    resumeInstruction: string;
+  }>;
+}
+
+export interface DesktopActionResponse {
+  ok: true;
+  affectedCardIds: string[];
+  state: DesktopStateResponse;
 }
 
 export interface SessionOutputResponse {

@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- 2026-06-29: Completed Chunk Two draft desktop shell. Added Electron +
+  React/Vite desktop app, bridge desktop state/action endpoints, session cards,
+  append-only event log view, profile/settings pane, guarded `Arm All`, and
+  Linux Electron smoke validation.
 - 2026-06-29: Completed Chunk One draft spike. Added the TypeScript/npm
   scaffold, VS Code companion extension, localhost `node-pty` bridge, managed
   Codex launch proof, bridge-backed read/write proof, and timestamped spike

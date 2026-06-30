@@ -9,7 +9,7 @@ export default tseslint.config(
   js.configs.recommended,
   ...tseslint.configs.recommendedTypeChecked,
   {
-    files: ["**/*.ts"],
+    files: ["**/*.{ts,tsx,mts}"],
     languageOptions: {
       parserOptions: {
         project: "./tsconfig.json",
@@ -21,6 +21,14 @@ export default tseslint.config(
     },
     rules: {
       "@typescript-eslint/no-floating-promises": "error"
+    }
+  },
+  {
+    files: ["src/desktop/renderer/**/*.{ts,tsx}"],
+    languageOptions: {
+      globals: {
+        ...globals.browser
+      }
     }
   }
 );

@@ -5,10 +5,13 @@ import {
   PROTOCOL_VERSION,
   isAgentProfileId,
   type BridgeHealthResponse,
+  type DesktopActionResponse,
+  type DesktopStateResponse,
   type ExtensionHeartbeat,
   type SendInputRequest,
   type StartSessionRequest
 } from "../shared/protocol";
+import { DesktopStateStore } from "./desktopState";
 import { ManagedPtySession } from "./managedPtySession";
 
 export interface BridgeServerOptions {
@@ -27,19 +30,21 @@ export interface BridgeRuntime {
 interface BridgeState {
   heartbeats: Map<string, ExtensionHeartbeat>;
   sessions: Map<string, ManagedPtySession>;
+  desktop: DesktopStateStore;
 }
 
-const DEFAULT_HOST = "127.0.0.1";
-const DEFAULT_PORT = 47320;
+export const DEFAULT_BRIDGE_HOST = "127.0.0.1";
+export const DEFAULT_BRIDGE_PORT = 47320;
 
 export async function startBridgeServer(
   options: BridgeServerOptions = {}
 ): Promise<BridgeRuntime> {
-  const host = options.host ?? DEFAULT_HOST;
-  const port = options.port ?? DEFAULT_PORT;
+  const host = options.host ?? DEFAULT_BRIDGE_HOST;
+  const port = options.port ?? DEFAULT_BRIDGE_PORT;
   const state: BridgeState = {
     heartbeats: new Map(),
-    sessions: new Map()
+    sessions: new Map(),
+    desktop: new DesktopStateStore()
   };
 
   const server = createServer((request, response) => {
@@ -83,6 +88,11 @@ async function handleRequest(
   response: ServerResponse
 ): Promise<void> {
   try {
+    if (request.method === "OPTIONS") {
+      sendEmpty(response, 204);
+      return;
+    }
+
     if (!request.url) {
       sendJson(response, 400, { ok: false, error: "Missing request URL" });
       return;
@@ -110,6 +120,7 @@ async function handleRequest(
         return;
       }
       state.heartbeats.set(heartbeat.windowId, heartbeat);
+      state.desktop.recordHeartbeat(heartbeat);
       sendJson(response, 200, { ok: true });
       return;
     }
@@ -143,6 +154,7 @@ async function handleRequest(
       });
       session.start();
       state.sessions.set(session.id, session);
+      state.desktop.recordSessionStarted(session.summary());
       sendJson(response, 201, session.summary());
       return;
     }
@@ -160,6 +172,7 @@ async function handleRequest(
         return;
       }
       session.write(body.text);
+      state.desktop.recordSessionInput(session.summary());
       sendJson(response, 200, { ok: true });
       return;
     }
@@ -178,6 +191,35 @@ async function handleRequest(
       return;
     }
 
+    if (request.method === "GET" && url.pathname === "/desktop/state") {
+      sendJson(response, 200, createDesktopState(state));
+      return;
+    }
+
+    if (request.method === "POST" && url.pathname === "/desktop/arm-all") {
+      sendDesktopAction(response, state.desktop.armAll(desktopInput(state)));
+      return;
+    }
+
+    const desktopActionMatch = url.pathname.match(
+      /^\/desktop\/cards\/([^/]+)\/(arm|pause|dismiss)$/u
+    );
+    if (request.method === "POST" && desktopActionMatch) {
+      const cardId = decodeURIComponent(desktopActionMatch[1]);
+      const action = desktopActionMatch[2];
+      const input = desktopInput(state);
+      if (action === "arm") {
+        sendDesktopAction(response, state.desktop.armCard(cardId, input));
+        return;
+      }
+      if (action === "pause") {
+        sendDesktopAction(response, state.desktop.pauseCard(cardId, input));
+        return;
+      }
+      sendDesktopAction(response, state.desktop.dismissCard(cardId, input));
+      return;
+    }
+
     sendJson(response, 404, { ok: false, error: "Not found" });
   } catch (error) {
     const message = error instanceof Error ? error.message : "Unknown bridge error";
@@ -185,12 +227,69 @@ async function handleRequest(
   }
 }
 
+function createDesktopState(state: BridgeState): DesktopStateResponse {
+  return state.desktop.createState(desktopInput(state));
+}
+
+function desktopInput(state: BridgeState): {
+  heartbeats: ExtensionHeartbeat[];
+  sessions: ReturnType<ManagedPtySession["summary"]>[];
+} {
+  return {
+    heartbeats: [...state.heartbeats.values()],
+    sessions: [...state.sessions.values()].map((session) => session.summary())
+  };
+}
+
+function sendDesktopAction(
+  response: ServerResponse,
+  result: {
+    statusCode: number;
+    body: DesktopActionResponse | { ok: false; error: string };
+  }
+): void {
+  sendJson(response, result.statusCode, result.body);
+}
+
 function sendJson(response: ServerResponse, statusCode: number, body: unknown): void {
   response.writeHead(statusCode, {
     "content-type": "application/json; charset=utf-8",
-    "cache-control": "no-store"
+    ...bridgeResponseHeaders(response)
   });
   response.end(JSON.stringify(body));
+}
+
+function sendEmpty(response: ServerResponse, statusCode: number): void {
+  response.writeHead(statusCode, bridgeResponseHeaders(response));
+  response.end();
+}
+
+function bridgeResponseHeaders(response: ServerResponse): Record<string, string> {
+  const headers: Record<string, string> = {
+    "cache-control": "no-store",
+    "access-control-allow-methods": "GET, POST, OPTIONS",
+    "access-control-allow-headers": "content-type"
+  };
+  const origin = response.req.headers.origin;
+  if (origin && isLoopbackBrowserOrigin(origin)) {
+    headers["access-control-allow-origin"] = origin;
+    headers.vary = "origin";
+  }
+  return headers;
+}
+
+function isLoopbackBrowserOrigin(origin: string): boolean {
+  try {
+    const url = new URL(origin);
+    return (
+      url.protocol === "http:" &&
+      (url.hostname === "localhost" ||
+        url.hostname === "127.0.0.1" ||
+        url.hostname === "::1")
+    );
+  } catch {
+    return false;
+  }
 }
 
 async function readJson<T>(request: IncomingMessage): Promise<T> {

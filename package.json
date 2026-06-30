@@ -1,7 +1,7 @@
 {
   "name": "perpetual-context-protection-automation",
   "displayName": "Perpetual Context Protection Automation",
-  "description": "VS Code companion extension and local bridge spike for managed AI coding sessions.",
+  "description": "Desktop operator app, VS Code companion extension, and local bridge for managed AI coding sessions.",
   "version": "0.0.1",
   "private": true,
   "publisher": "adamgoodwin",
@@ -64,22 +64,32 @@
   },
   "scripts": {
     "compile": "tsc -p .",
-    "lint": "eslint src test",
+    "lint": "eslint src test vite.desktop.config.mts",
     "test": "npm run compile && node --test dist/test/unit/*.test.js",
     "test:vscode": "npm run compile && xvfb-run -a node dist/test/vscode/runTest.js",
-    "build": "npm run compile"
+    "build": "npm run compile && vite build --config vite.desktop.config.mts",
+    "desktop:launch": "npm run build && electron dist/src/desktop/main.js",
+    "desktop:smoke": "npm run build && xvfb-run -a electron dist/src/desktop/main.js --smoke"
   },
   "dependencies": {
-    "node-pty": "^1.1.0"
+    "lucide-react": "^1.22.0",
+    "node-pty": "^1.1.0",
+    "react": "^19.2.7",
+    "react-dom": "^19.2.7"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
     "@types/node": "^26.0.1",
+    "@types/react": "^19.2.17",
+    "@types/react-dom": "^19.2.3",
     "@types/vscode": "^1.125.0",
+    "@vitejs/plugin-react": "^6.0.3",
     "@vscode/test-electron": "^3.0.0",
+    "electron": "^42.5.1",
     "eslint": "^10.6.0",
     "globals": "^17.7.0",
     "typescript": "^6.0.3",
-    "typescript-eslint": "^8.62.1"
+    "typescript-eslint": "^8.62.1",
+    "vite": "^8.1.0"
   }
 }

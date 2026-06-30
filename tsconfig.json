@@ -6,6 +6,7 @@
       "ES2022",
       "DOM"
     ],
+    "jsx": "react-jsx",
     "rootDir": ".",
     "outDir": "dist",
     "strict": true,
@@ -15,11 +16,16 @@
     "skipLibCheck": true,
     "types": [
       "node",
+      "react",
+      "react-dom",
+      "vite/client",
       "vscode"
     ]
   },
   "include": [
     "src/**/*.ts",
-    "test/**/*.ts"
+    "src/**/*.tsx",
+    "test/**/*.ts",
+    "vite.desktop.config.mts"
   ]
 }

@@ -1,7 +1,7 @@
 # Current Build Pathway
 
-Last Updated: 2026-06-29T19:18:45-06:00
-Status: Chunk One draft complete - Chunk Two ready
+Last Updated: 2026-06-29T19:37:10-06:00
+Status: Chunk Two draft complete - Chunk Three ready
 Owner: Technical Lead
 
 > **Single active pathway document.** This is the live path from planning to a
@@ -63,8 +63,8 @@ human decision.
 | Planning revision | done | 2026-06-29T18:37:53-06:00 | Adam + Codex | VS Code-first desktop app + extension direction confirmed |
 | Chunk Zero - Repo and public project setup | done | 2026-06-29T18:55:26-06:00 | build agent | Git initialized, public remote pushed, corrected local path cleanup complete |
 | Chunk One - VS Code integration spike | done | 2026-06-29T19:18:45-06:00 | build agent | Bridge-owned `node-pty` path proved on Linux; Windows validation handoff recorded |
-| Chunk Two - Desktop shell and session cards | active | 2026-06-29T19:18:45-06:00 | build agent | Full window UI and extension bridge |
-| Chunk Three - Agent profiles and signal detector | pending | - | build agent | Claude/Codex profiles, multi-signal boundary detection |
+| Chunk Two - Desktop shell and session cards | done | 2026-06-29T19:37:10-06:00 | build agent | Electron desktop shell, bridge desktop state, session cards, logs, and guarded operator actions |
+| Chunk Three - Agent profiles and signal detector | active | 2026-06-29T19:37:10-06:00 | build agent | Claude/Codex profiles, multi-signal boundary detection |
 | Chunk Four - One managed compact cycle | pending | - | build agent | Safe dry-run then live compact/resume for one session |
 | Chunk Five - Multi-session arm/pause/all control | pending | - | build agent | Multiple session cards, operator approvals, logs |
 | Chunk Six - Windows/Linux packaging | pending | - | build agent | Installable app + extension setup |
@@ -200,7 +200,7 @@ the bridge heartbeat and managed session data.
 
 ## Chunk Two - Desktop Shell And Session Cards
 
-Status: active
+Status: done
 
 Completion target: Draft complete
 
@@ -226,13 +226,13 @@ Outputs:
 
 Acceptance criteria:
 
-- [ ] Desktop app launches on Linux
-- [ ] Desktop app receives at least one VS Code extension heartbeat
-- [ ] Session card displays workspace, agent, observability level, status, last event, and chunk count
-- [ ] Operator can arm, pause, and dismiss a session card
-- [ ] `Arm All` applies only to managed/adopted sessions
-- [ ] Candidate/unsupported sessions are visible but cannot be armed unattended
-- [ ] Logs are append-only and inspectable from the UI
+- [x] Desktop app launches on Linux
+- [x] Desktop app receives at least one VS Code extension heartbeat
+- [x] Session card displays workspace, agent, observability level, status, last event, and chunk count
+- [x] Operator can arm, pause, and dismiss a session card
+- [x] `Arm All` applies only to managed/adopted sessions
+- [x] Candidate/unsupported sessions are visible but cannot be armed unattended
+- [x] Logs are append-only and inspectable from the UI
 
 Validation:
 
@@ -245,11 +245,32 @@ npm run build
 Stop condition: Stop if desktop/extension bridge reliability is unclear or if
 the UI cannot represent observability levels without confusing the operator.
 
+Evidence:
+
+- 2026-06-29T19:37:10-06:00: Added Electron + React/Vite desktop shell with a full-window operator surface, session metrics, session cards, event log, and settings/profile pane.
+- 2026-06-29T19:37:10-06:00: Added bridge desktop state and action endpoints: `/desktop/state`, `/desktop/arm-all`, `/desktop/cards/:id/arm`, `/desktop/cards/:id/pause`, and `/desktop/cards/:id/dismiss`.
+- 2026-06-29T19:37:10-06:00: Added append-only in-memory desktop event log entries for heartbeats, session starts, input sends, arm, pause, dismiss, and arm-all actions.
+- 2026-06-29T19:37:10-06:00: Added unit coverage proving managed cards can be armed, candidates stay visible but cannot be armed, `Arm All` only affects managed cards, and dismiss removes a card while preserving event history.
+- 2026-06-29T19:37:10-06:00: Updated VS Code extension-host test to assert a VS Code heartbeat appears through `/desktop/state`.
+- 2026-06-29T19:37:10-06:00: `npm run lint` passed.
+- 2026-06-29T19:37:10-06:00: `npm test` passed with 2 unit tests.
+- 2026-06-29T19:37:10-06:00: `npm run build` passed and produced the desktop renderer bundle.
+- 2026-06-29T19:37:10-06:00: `npm run test:vscode` passed under `xvfb`; extension heartbeat was visible through desktop state and the managed echo read/write proof still passed.
+- 2026-06-29T19:37:10-06:00: `npm run desktop:smoke` passed under `xvfb`; Electron loaded the desktop shell on Linux and exited through the smoke hook.
+
+Close-out state: Draft complete. The first operator surface exists and is wired
+to bridge-backed heartbeat/session data. Arm/adoption beyond bridge-managed
+sessions remains future work; `Arm All` currently applies only to managed
+sessions because no explicit adoption flow exists yet.
+
+Next action: Start Chunk Three and implement the agent profile schema plus the
+conservative multi-signal detector.
+
 ---
 
 ## Chunk Three - Agent Profiles And Signal Detector
 
-Status: planned
+Status: active
 
 Completion target: Task complete
 

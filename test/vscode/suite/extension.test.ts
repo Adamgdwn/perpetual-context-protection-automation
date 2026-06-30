@@ -1,7 +1,10 @@
 import assert from "node:assert/strict";
 import * as vscode from "vscode";
 import { startBridgeServer, type BridgeRuntime } from "../../../src/bridge/bridgeServer";
-import type { BridgeSessionSummary } from "../../../src/shared/protocol";
+import type {
+  BridgeSessionSummary,
+  DesktopStateResponse
+} from "../../../src/shared/protocol";
 
 export async function runExtensionCompanionTest(): Promise<void> {
   let runtime: BridgeRuntime | undefined;
@@ -20,6 +23,15 @@ export async function runExtensionCompanionTest(): Promise<void> {
 
     const heartbeat = await vscode.commands.executeCommand("pcpa.sendHeartbeat");
     assert.ok(heartbeat);
+
+    const desktopStateResponse = await fetch(`${runtime.url}/desktop/state`);
+    assert.equal(desktopStateResponse.ok, true);
+    const desktopState =
+      (await desktopStateResponse.json()) as DesktopStateResponse;
+    assert.equal(desktopState.connection.heartbeatCount, 1);
+    assert.ok(
+      desktopState.cards.some((card) => card.workspaceName === "untitled-vscode-window")
+    );
 
     const codexSession = await vscode.commands.executeCommand<BridgeSessionSummary>(
       "pcpa.startManagedCodex"
