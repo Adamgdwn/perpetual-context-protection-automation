@@ -55,6 +55,8 @@ bash scripts/governance-preflight.sh
 - Stop when the chunk's definition of done is met, when its stop condition is reached, or when repeated attempts stop producing new evidence.
 - In the active plan document, label active and planned chunks clearly and keep the document's existing heading pattern.
 - Timestamp material work, decisions, validation, and handoffs.
+- For build documents and information documents, follow the document-control
+  filename rule in `docs/standards/document-control-standard.md`.
 - Update the active plan named by `START_HERE.md` when the active plan, status, or next chunk changes.
 
 ## Fundamentals-First AI Coding

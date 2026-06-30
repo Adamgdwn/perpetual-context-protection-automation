@@ -31,6 +31,7 @@ Keep these files compact. They should route to durable docs, not duplicate them.
 | Durable implementation, design quality, testing discipline, or AI coding fundamentals | `docs/policy/durable-development-engineering-policy.md` |
 | Use-case controls, risk tier, governance level, or owner decisions | `docs/standards/engineering-governance-by-use-case.md` |
 | Completion labels, Definition of Shipped, release evidence, or finish reports | `docs/standards/ship-ready-engineering-standard.md` |
+| Document control, timestamped filenames, build docs, or information docs | `docs/standards/document-control-standard.md` |
 | Architecture decisions or system shape | `docs/architecture.md` and relevant ADRs |
 | Domain terms or naming | `docs/domain-language.md` |
 | Deployment, release, rollback, or environment changes | `docs/deployment-guide.md`, `docs/runbook.md`, and release standards |

@@ -4,6 +4,13 @@
 
 - Implementation not yet started. See `docs/current-build-pathway.md`.
 
+## 2026-06-29 - Document Control Filename Convention
+
+- Added `docs/standards/document-control-standard.md`.
+- Recorded the rule that standalone new or replacement build and information documents should use a local-time filename prefix like `YYYY-MM-DD-HHMM-`.
+- Clarified that dependency-bearing documents keep stable filenames and titles, with the last major update timestamp in the document body.
+- Linked the new standard from the standards index, context map, and agent instructions.
+
 ## 2026-06-29 - Chunk Zero Path Cleanup
 
 - Completed local path cleanup for the corrected `perpetual-context-protection-automation` slug.
