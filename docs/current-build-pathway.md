@@ -1,7 +1,7 @@
 # Current Build Pathway
 
-Last Updated: 2026-06-29T18:55:26-06:00
-Status: Chunk Zero complete - Chunk One active
+Last Updated: 2026-06-29T19:18:45-06:00
+Status: Chunk One draft complete - Chunk Two ready
 Owner: Technical Lead
 
 > **Single active pathway document.** This is the live path from planning to a
@@ -62,8 +62,8 @@ human decision.
 |---|---|---|---|---|
 | Planning revision | done | 2026-06-29T18:37:53-06:00 | Adam + Codex | VS Code-first desktop app + extension direction confirmed |
 | Chunk Zero - Repo and public project setup | done | 2026-06-29T18:55:26-06:00 | build agent | Git initialized, public remote pushed, corrected local path cleanup complete |
-| Chunk One - VS Code integration spike | active | 2026-06-29T18:55:26-06:00 | build agent | Prove reliable terminal read/write path |
-| Chunk Two - Desktop shell and session cards | pending | - | build agent | Full window UI and extension bridge |
+| Chunk One - VS Code integration spike | done | 2026-06-29T19:18:45-06:00 | build agent | Bridge-owned `node-pty` path proved on Linux; Windows validation handoff recorded |
+| Chunk Two - Desktop shell and session cards | active | 2026-06-29T19:18:45-06:00 | build agent | Full window UI and extension bridge |
 | Chunk Three - Agent profiles and signal detector | pending | - | build agent | Claude/Codex profiles, multi-signal boundary detection |
 | Chunk Four - One managed compact cycle | pending | - | build agent | Safe dry-run then live compact/resume for one session |
 | Chunk Five - Multi-session arm/pause/all control | pending | - | build agent | Multiple session cards, operator approvals, logs |
@@ -128,7 +128,7 @@ Next action: Start Chunk One and prove the VS Code terminal read/write path.
 
 ## Chunk One - VS Code Integration Spike
 
-Status: active
+Status: done
 
 Completion target: Draft complete
 
@@ -158,32 +158,49 @@ Outputs:
 
 Acceptance criteria:
 
-- [ ] Extension starts in VS Code dev host
-- [ ] Extension sends heartbeat to local bridge with workspace/window identity
-- [ ] Extension can launch a managed Claude or Codex session
-- [ ] Extension or bridge can read output from that managed session
-- [ ] Extension or bridge can send text into that managed session
-- [ ] Linux result is proven locally
-- [ ] Windows result is proven or a specific Windows validation handoff is recorded
-- [ ] Unsupported arbitrary terminals are classified as candidate/unsupported, not silently automated
+- [x] Extension starts in VS Code dev host
+- [x] Extension sends heartbeat to local bridge with workspace/window identity
+- [x] Extension can launch a managed Claude or Codex session
+- [x] Extension or bridge can read output from that managed session
+- [x] Extension or bridge can send text into that managed session
+- [x] Linux result is proven locally
+- [x] Windows result is proven or a specific Windows validation handoff is recorded
+- [x] Unsupported arbitrary terminals are classified as candidate/unsupported, not silently automated
 
 Validation:
 
 ```bash
-npm test
+npm audit
 npm run lint
-# plus manual VS Code extension host validation recorded in this file
+npm test
+npm run test:vscode
 ```
+
+Evidence:
+
+- 2026-06-29T19:18:45-06:00: Added root TypeScript/npm scaffold, VS Code extension manifest, localhost bridge, `node-pty` managed session runtime, and extension-host test runner.
+- 2026-06-29T19:18:45-06:00: `npm audit` passed with 0 vulnerabilities after removing unnecessary Mocha dependency.
+- 2026-06-29T19:18:45-06:00: `npm run lint` passed.
+- 2026-06-29T19:18:45-06:00: `npm test` passed; bridge accepted heartbeat, launched managed echo PTY, read output, and sent input.
+- 2026-06-29T19:18:45-06:00: `npm run test:vscode` passed under `xvfb`; VS Code extension host activated, heartbeat command worked, managed Codex launch command worked, and bridge-backed echo read/write proof passed.
+- 2026-06-29T19:18:45-06:00: Spike notes and observability matrix recorded in `docs/spikes/2026-06-29-1918-vscode-terminal-io-spike-notes.md`.
 
 Stop condition: Stop if no reliable read/write path exists for interactive
 Claude/Codex sessions inside VS Code. Escalate with options: managed
 pseudoterminal, helper process, or tmux/node-pty adapter.
 
+Close-out state: Draft complete. The reliable v1 path is bridge-owned managed
+PTY sessions surfaced through the VS Code extension. Windows validation remains
+a handoff item rather than a Linux-local proof.
+
+Next action: Start Chunk Two and build the desktop shell/session cards against
+the bridge heartbeat and managed session data.
+
 ---
 
 ## Chunk Two - Desktop Shell And Session Cards
 
-Status: planned
+Status: active
 
 Completion target: Draft complete
 

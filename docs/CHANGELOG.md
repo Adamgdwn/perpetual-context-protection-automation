@@ -2,7 +2,10 @@
 
 ## Unreleased
 
-- Implementation not yet started. See `docs/current-build-pathway.md`.
+- 2026-06-29: Completed Chunk One draft spike. Added the TypeScript/npm
+  scaffold, VS Code companion extension, localhost `node-pty` bridge, managed
+  Codex launch proof, bridge-backed read/write proof, and timestamped spike
+  notes at `docs/spikes/2026-06-29-1918-vscode-terminal-io-spike-notes.md`.
 
 ## 2026-06-29 - Document Control Filename Convention
 

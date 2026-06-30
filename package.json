@@ -1,0 +1,85 @@
+{
+  "name": "perpetual-context-protection-automation",
+  "displayName": "Perpetual Context Protection Automation",
+  "description": "VS Code companion extension and local bridge spike for managed AI coding sessions.",
+  "version": "0.0.1",
+  "private": true,
+  "publisher": "adamgoodwin",
+  "license": "UNLICENSED",
+  "engines": {
+    "vscode": "^1.125.0",
+    "node": ">=24.14.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "main": "./dist/src/extension/extension.js",
+  "activationEvents": [
+    "onStartupFinished",
+    "onCommand:pcpa.sendHeartbeat",
+    "onCommand:pcpa.startManagedClaude",
+    "onCommand:pcpa.startManagedCodex",
+    "onCommand:pcpa.runManagedIoProof",
+    "onCommand:pcpa.sendTextToManagedSession"
+  ],
+  "contributes": {
+    "configuration": {
+      "title": "Perpetual Context Protection",
+      "properties": {
+        "pcpa.bridgeUrl": {
+          "type": "string",
+          "default": "http://127.0.0.1:47320",
+          "description": "Localhost URL for the Perpetual Context Protection bridge."
+        },
+        "pcpa.heartbeatIntervalMs": {
+          "type": "number",
+          "default": 10000,
+          "minimum": 1000,
+          "description": "How often the VS Code companion extension sends a bridge heartbeat."
+        }
+      }
+    },
+    "commands": [
+      {
+        "command": "pcpa.sendHeartbeat",
+        "title": "Perpetual Context Protection: Send Heartbeat"
+      },
+      {
+        "command": "pcpa.startManagedClaude",
+        "title": "Perpetual Context Protection: Start Managed Claude Session"
+      },
+      {
+        "command": "pcpa.startManagedCodex",
+        "title": "Perpetual Context Protection: Start Managed Codex Session"
+      },
+      {
+        "command": "pcpa.runManagedIoProof",
+        "title": "Perpetual Context Protection: Run Managed I/O Proof"
+      },
+      {
+        "command": "pcpa.sendTextToManagedSession",
+        "title": "Perpetual Context Protection: Send Text To Managed Session"
+      }
+    ]
+  },
+  "scripts": {
+    "compile": "tsc -p .",
+    "lint": "eslint src test",
+    "test": "npm run compile && node --test dist/test/unit/*.test.js",
+    "test:vscode": "npm run compile && xvfb-run -a node dist/test/vscode/runTest.js",
+    "build": "npm run compile"
+  },
+  "dependencies": {
+    "node-pty": "^1.1.0"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "@types/node": "^26.0.1",
+    "@types/vscode": "^1.125.0",
+    "@vscode/test-electron": "^3.0.0",
+    "eslint": "^10.6.0",
+    "globals": "^17.7.0",
+    "typescript": "^6.0.3",
+    "typescript-eslint": "^8.62.1"
+  }
+}

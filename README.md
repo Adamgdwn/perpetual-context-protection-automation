@@ -21,20 +21,29 @@ complete or blocked.
 - Technical lead: hybrid session (Claude Code + Codex)
 - Governance level: 1
 - Risk tier: low
-- Production status: revised planning - VS Code-first implementation not yet started
+- Production status: Chunk One draft spike complete - desktop shell not yet started
 - Planned public repo name: `perpetual-context-protection-automation`
 
 ## Quick Start
 
-No runnable code yet.
+Use the existing nvm Node install, then install dependencies and run checks:
+
+```bash
+source /home/adamgoodwin/.nvm/nvm.sh
+nvm use --silent
+npm install
+npm run lint
+npm test
+npm run test:vscode
+```
 
 Use `docs/current-build-pathway.md` as the active implementation route. The
 original tmux/n8n research plan in `PLAN.md` is retained as superseded research,
 not the current build path.
 
-The first implementation slice proves the VS Code integration can detect
-windows/sessions, create session cards, and reliably read/write at least one
-managed coder terminal.
+The first implementation slice proves the VS Code extension can start in an
+extension host, send heartbeats to a localhost bridge, request a managed Codex
+PTY session, and read/write a bridge-owned managed terminal.
 
 ## Key Files
 

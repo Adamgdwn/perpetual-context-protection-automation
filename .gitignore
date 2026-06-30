@@ -1,0 +1,6 @@
+node_modules/
+dist/
+.vscode-test/
+graphify-out/
+*.vsix
+npm-debug.log*

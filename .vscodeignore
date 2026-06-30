@@ -1,0 +1,8 @@
+.git/**
+.vscode-test/**
+docs/**
+src/**
+test/**
+*.md
+tsconfig.json
+eslint.config.mjs

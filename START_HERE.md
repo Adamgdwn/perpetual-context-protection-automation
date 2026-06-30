@@ -1,7 +1,7 @@
 # Start Here
 
-Last Updated: 2026-06-29T18:55:26-06:00
-Status: Chunk Zero path cleanup complete - ready for Chunk One
+Last Updated: 2026-06-29T19:18:45-06:00
+Status: Chunk One draft complete - ready for Chunk Two
 Owner: Adam Goodwin
 
 ## 2026-06-29 Chunk Zero Completion Handoff
@@ -20,7 +20,7 @@ Resume rule for the next implementation session:
 2. Run `git status --short`.
 3. Read this file and `docs/current-build-pathway.md`.
 4. Do not restart from the superseded tmux/n8n plan in `PLAN.md`.
-5. Start Chunk One, the VS Code integration spike.
+5. Start Chunk Two, the desktop shell and session cards.
 
 Most important product decision:
 
@@ -113,7 +113,7 @@ and architecture plan. `PLAN.md` is retained as superseded tmux/n8n research.
 
 Current priorities:
 
-- **Start Chunk One** - VS Code integration spike and reliable terminal I/O proof
+- **Start Chunk Two** - desktop shell and session cards backed by the bridge heartbeat/session data
 - Build VS Code-first, coder-agnostic behavior before optional tmux or n8n adapters
 - Treat terminal observability as explicit session metadata: managed, adoptable, or unsupported
 - Use multi-signal pause detection, not a single required `===CHUNK_DONE===` phrase
