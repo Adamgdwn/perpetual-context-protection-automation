@@ -1,7 +1,7 @@
 # Current Build Pathway
 
-Last Updated: 2026-06-29T19:37:10-06:00
-Status: Chunk Two draft complete - Chunk Three ready
+Last Updated: 2026-06-29T20:11:30-06:00
+Status: Chunk Three task complete - Chunk Four ready
 Owner: Technical Lead
 
 > **Single active pathway document.** This is the live path from planning to a
@@ -64,8 +64,8 @@ human decision.
 | Chunk Zero - Repo and public project setup | done | 2026-06-29T18:55:26-06:00 | build agent | Git initialized, public remote pushed, corrected local path cleanup complete |
 | Chunk One - VS Code integration spike | done | 2026-06-29T19:18:45-06:00 | build agent | Bridge-owned `node-pty` path proved on Linux; Windows validation handoff recorded |
 | Chunk Two - Desktop shell and session cards | done | 2026-06-29T19:37:10-06:00 | build agent | Electron desktop shell, bridge desktop state, session cards, logs, and guarded operator actions |
-| Chunk Three - Agent profiles and signal detector | active | 2026-06-29T19:37:10-06:00 | build agent | Claude/Codex profiles, multi-signal boundary detection |
-| Chunk Four - One managed compact cycle | pending | - | build agent | Safe dry-run then live compact/resume for one session |
+| Chunk Three - Agent profiles and signal detector | done | 2026-06-29T20:11:30-06:00 | build agent | Claude/Codex profiles, multi-signal boundary detection |
+| Chunk Four - One managed compact cycle | active | 2026-06-29T20:11:30-06:00 | build agent | Safe dry-run then live compact/resume for one session |
 | Chunk Five - Multi-session arm/pause/all control | pending | - | build agent | Multiple session cards, operator approvals, logs |
 | Chunk Six - Windows/Linux packaging | pending | - | build agent | Installable app + extension setup |
 | Chunk Seven - Public release hardening | pending | - | build agent | Docs, examples, security notes, GitHub release path |
@@ -270,7 +270,7 @@ conservative multi-signal detector.
 
 ## Chunk Three - Agent Profiles And Signal Detector
 
-Status: active
+Status: done
 
 Completion target: Task complete
 
@@ -296,28 +296,44 @@ Outputs:
 
 Acceptance criteria:
 
-- [ ] Profiles define launch command, compact command, resume message, complete signals, blocked signals, and idle rules
-- [ ] Detector accepts explicit markers when present
-- [ ] Detector can identify likely chunk-boundary closing language only when idle evidence agrees
-- [ ] Detector identifies complete/blocked/needs-human states
-- [ ] Detector returns `uncertain` instead of guessing when signals conflict
-- [ ] Tests cover chunk boundary, active streaming, task complete, blocked, compacting, and false-positive cases
+- [x] Profiles define launch command, compact command, resume message, complete signals, blocked signals, and idle rules
+- [x] Detector accepts explicit markers when present
+- [x] Detector can identify likely chunk-boundary closing language only when idle evidence agrees
+- [x] Detector identifies complete/blocked/needs-human states
+- [x] Detector returns `uncertain` instead of guessing when signals conflict
+- [x] Tests cover chunk boundary, active streaming, task complete, blocked, compacting, and false-positive cases
 
 Validation:
 
 ```bash
 npm run lint
-npm test -- signal
+npm run test:signal
+npm test
+npm run build
 ```
 
-Stop condition: Stop if real transcript samples are insufficient. Add a manual
-sample-capture task before attempting live automation.
+Validation evidence:
+
+- 2026-06-29T20:02:32-06:00: `bash scripts/governance-preflight.sh` passed with 0 warnings before the autonomous signal-detector work.
+- 2026-06-29T20:11:30-06:00: Added coder-agnostic profile schema fields for launch commands, compact command, resume instruction, signal patterns, idle rules, and prompt hints.
+- 2026-06-29T20:11:30-06:00: Added built-in Claude and Codex profile signals for explicit markers, natural boundary language, complete, blocked, needs-human, compacting, active, input-ready, and conflict guards.
+- 2026-06-29T20:11:30-06:00: Added conservative `detectSessionSignal` module that returns `chunk-boundary`, `task-complete`, `blocked`, `needs-human`, `compacting`, `active`, or `uncertain` plus evidence.
+- 2026-06-29T20:11:30-06:00: Added representative fixture tests for explicit markers, natural boundary language, active streaming, task complete, blocked, needs-human, compacting, conflict, and false-positive cases.
+- 2026-06-29T20:11:30-06:00: `npm run test:signal` passed with 9 detector tests.
+- 2026-06-29T20:11:30-06:00: `npm run lint` passed.
+- 2026-06-29T20:11:30-06:00: `npm test` passed with 11 unit tests.
+- 2026-06-29T20:11:30-06:00: `npm run build` passed.
+
+Close-out state: Task complete. The detector is ready for a dry-run compact
+cycle. Full live Claude/Codex transcript samples are still limited; Chunk Four
+must capture or review a disposable live-session sample before sending a live
+compact command.
 
 ---
 
 ## Chunk Four - One Managed Compact Cycle
 
-Status: planned
+Status: active
 
 Completion target: Integration complete
 
@@ -332,6 +348,7 @@ Inputs:
 - Chunk One terminal I/O path
 - Chunk Three detector
 - One managed test session with a small chunked task
+- Disposable live Claude/Codex transcript sample captured or reviewed before live compact mode
 
 Outputs:
 

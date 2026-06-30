@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+- 2026-06-29: Completed Chunk Three task. Added coder-agnostic agent profile
+  schema fields, built-in Claude/Codex signal profiles, conservative
+  multi-signal detector, targeted `test:signal` script, and fixture-based
+  coverage for boundary, complete, blocked, needs-human, active, compacting,
+  conflict, and false-positive cases.
 - 2026-06-29: Completed Chunk Two draft desktop shell. Added Electron +
   React/Vite desktop app, bridge desktop state/action endpoints, session cards,
   append-only event log view, profile/settings pane, guarded `Arm All`, and

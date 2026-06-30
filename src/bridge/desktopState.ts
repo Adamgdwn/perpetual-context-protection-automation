@@ -10,7 +10,10 @@ import {
   type SessionCardStatus,
   type TerminalSummary
 } from "../shared/protocol";
-import { resolveAgentProfile } from "../shared/profiles";
+import {
+  BUILT_IN_AGENT_PROFILE_IDS,
+  resolveAgentProfile
+} from "../shared/profiles";
 
 interface DesktopStateActionResult {
   statusCode: number;
@@ -21,8 +24,6 @@ interface CardBuildInput {
   heartbeats: ExtensionHeartbeat[];
   sessions: BridgeSessionSummary[];
 }
-
-const profileIds = ["claude", "codex", "echo-proof"] as const;
 
 export class DesktopStateStore {
   private readonly automationByCardId = new Map<string, SessionAutomationState>();
@@ -71,7 +72,7 @@ export class DesktopStateStore {
       },
       cards,
       events: [...this.eventLog],
-      profiles: profileIds.map((profileId) => {
+      profiles: BUILT_IN_AGENT_PROFILE_IDS.map((profileId) => {
         const profile = resolveAgentProfile(profileId);
         return {
           id: profile.id,
