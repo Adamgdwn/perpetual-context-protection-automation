@@ -2,6 +2,14 @@
 
 ## Unreleased
 
+- 2026-06-29: Added Chunk Five draft multi-session controls. Workspace-grouped
+  session cards now expose arm/resume/pause/reset/kill/dismiss controls,
+  `Arm All` only arms idle bridge-managed sessions, candidate/unsupported
+  sessions remain non-armable, and event details include session id, card id,
+  workspace, agent, action, and result. Also fixed blank Electron launches by
+  using relative Vite renderer assets, upgraded desktop smoke to assert rendered
+  shell text, refreshed the launcher with an infinity icon, and added
+  multi-session unit coverage.
 - 2026-06-29: Added Chunk Four implementation checkpoint. Introduced the
   bridge-side compact-cycle automation controller, dry-run/live mode, detector
   evidence in desktop logs, pause-safe compact/resume state handling,

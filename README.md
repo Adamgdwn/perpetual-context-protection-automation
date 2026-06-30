@@ -1,6 +1,6 @@
 # Perpetual Context Protection Automation
 
-Last updated: 2026-06-29T20:29:52-06:00
+Last updated: 2026-06-29T20:44:55-06:00
 
 ## Purpose
 
@@ -23,7 +23,7 @@ complete or blocked.
 - Technical lead: hybrid session (Claude Code + Codex)
 - Governance level: 1
 - Risk tier: low
-- Production status: Chunk Four implementation checkpoint - manual live cycle pending
+- Production status: Chunk Five draft controls added - manual live and two-session evidence pending
 - Planned public repo name: `perpetual-context-protection-automation`
 
 ## Quick Start
@@ -47,8 +47,9 @@ not the current build path.
 
 The current implementation includes the VS Code companion extension, localhost
 bridge, managed PTY session path, and Electron desktop shell. The desktop app
-renders bridge-backed session cards, append-only logs, and guarded operator
-actions where candidate sessions remain visible but cannot be armed unattended.
+renders bridge-backed workspace-grouped session cards, append-only logs,
+dry-run/live automation mode, and guarded operator actions where candidate and
+unsupported sessions remain visible but cannot be armed unattended.
 
 Launch the draft desktop shell locally with:
 
@@ -69,6 +70,10 @@ On this workstation the launcher is installed at:
 ```text
 /home/adamgoodwin/Desktop/Perpetual Context Protection.desktop
 ```
+
+The launcher uses the infinity icon. If the desktop app ever opens blank, run
+`npm run desktop:smoke`; the smoke check now fails unless the rendered app shell
+text appears.
 
 ## Key Files
 

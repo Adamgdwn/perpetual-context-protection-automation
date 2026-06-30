@@ -103,6 +103,7 @@ export class ManagedPtySession {
   public stop(): void {
     if (this.process && this.status !== "exited") {
       this.process.kill();
+      this.status = "exited";
     }
   }
 

@@ -96,10 +96,19 @@ export class AutomationController {
     return this.snapshotFromRecord(record);
   }
 
+  public resumeCard(cardId: string): AutomationSnapshot {
+    return this.armCard(cardId);
+  }
+
   public pauseCard(cardId: string): AutomationSnapshot {
     const record = this.ensureRecord(cardId);
     record.state = "paused";
     return this.snapshotFromRecord(record);
+  }
+
+  public resetCard(cardId: string): AutomationSnapshot {
+    this.records.delete(cardId);
+    return this.getSnapshot(cardId);
   }
 
   public dismissCard(cardId: string): void {
@@ -334,13 +343,22 @@ function createAutomationEvent(
   }
 ): AutomationRuntimeEvent {
   const summary = session.summary();
+  const cardId = managedCardId(session.id);
   return {
     kind,
-    cardId: managedCardId(session.id),
+    cardId,
     workspaceId: summary.workspaceId,
-    affectedCardIds: [managedCardId(session.id)],
+    affectedCardIds: [cardId],
     message: event.message,
-    details: event.details
+    details: [
+      `session:${summary.id}`,
+      `card:${cardId}`,
+      `workspace:${summary.workspaceName}`,
+      `agent:${session.profile.displayName}`,
+      `action:${kind}`,
+      "result:ok",
+      ...(event.details ?? [])
+    ]
   };
 }
 

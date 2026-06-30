@@ -1,7 +1,7 @@
 # Start Here
 
-Last Updated: 2026-06-29T20:29:52-06:00
-Status: Chunk Four implementation checkpoint - manual live cycle pending
+Last Updated: 2026-06-29T20:44:55-06:00
+Status: Chunk Five draft controls added - manual live and two-session evidence pending
 Owner: Adam Goodwin
 
 ## 2026-06-29 Chunk Zero Completion Handoff
@@ -20,7 +20,8 @@ Resume rule for the next implementation session:
 2. Run `git status --short`.
 3. Read this file and `docs/current-build-pathway.md`.
 4. Do not restart from the superseded tmux/n8n plan in `PLAN.md`.
-5. Continue Chunk Four with the human-observed dry-run then live compact cycle.
+5. Continue human-observed validation: Chunk Four one-session dry-run/live
+   compact cycle first, then Chunk Five two-session validation.
 
 Most important product decision:
 
@@ -113,7 +114,7 @@ and architecture plan. `PLAN.md` is retained as superseded tmux/n8n research.
 
 Current priorities:
 
-- **Continue Chunk Four** - launch the desktop app from `/home/adamgoodwin/Desktop/Perpetual Context Protection.desktop`, dry-run first, then live only while Adam watches
+- **Continue observed validation** - launch the infinity-icon desktop app from `/home/adamgoodwin/Desktop/Perpetual Context Protection.desktop`; verify it renders, run Chunk Four dry-run first, then live only while Adam watches, then perform a Chunk Five two-session pass
 - Build VS Code-first, coder-agnostic behavior before optional tmux or n8n adapters
 - Treat terminal observability as explicit session metadata: managed, adoptable, candidate, or unsupported
 - Use multi-signal pause detection, not a single required `===CHUNK_DONE===` phrase

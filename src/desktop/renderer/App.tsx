@@ -4,12 +4,15 @@ import {
   Activity,
   Ban,
   Circle,
+  InfinityIcon,
   Pause,
   Play,
   Radio,
   RefreshCw,
+  RotateCcw,
   Settings,
   ShieldCheck,
+  Square,
   Terminal,
   X
 } from "lucide-react";
@@ -80,7 +83,7 @@ export function App(): ReactElement {
       <header className="topbar">
         <div className="brand-block">
           <div className="brand-mark" aria-hidden="true">
-            <ShieldCheck size={22} />
+            <InfinityIcon size={23} />
           </div>
           <div>
             <h1>Perpetual Context Protection</h1>
@@ -158,8 +161,17 @@ export function App(): ReactElement {
               onArm={(cardId) =>
                 void runAction(cardId, () => desktopApi.armCard(cardId))
               }
+              onResume={(cardId) =>
+                void runAction(cardId, () => desktopApi.resumeCard(cardId))
+              }
               onPause={(cardId) =>
                 void runAction(cardId, () => desktopApi.pauseCard(cardId))
+              }
+              onReset={(cardId) =>
+                void runAction(cardId, () => desktopApi.resetCard(cardId))
+              }
+              onKill={(cardId) =>
+                void runAction(cardId, () => desktopApi.killCard(cardId))
               }
               onDismiss={(cardId) =>
                 void runAction(cardId, () => desktopApi.dismissCard(cardId))
@@ -190,11 +202,15 @@ function SessionsPane(props: {
   cards: DesktopSessionCard[];
   busyCardId: string | undefined;
   onArm: (cardId: string) => void;
+  onResume: (cardId: string) => void;
   onPause: (cardId: string) => void;
+  onReset: (cardId: string) => void;
+  onKill: (cardId: string) => void;
   onDismiss: (cardId: string) => void;
   onArmAll: () => void;
 }): ReactElement {
   const armableCount = props.cards.filter((card) => card.canArmAll).length;
+  const groups = useMemo(() => groupCardsByWorkspace(props.cards), [props.cards]);
 
   return (
     <div className="pane-content">
@@ -220,16 +236,31 @@ function SessionsPane(props: {
           <span>No VS Code heartbeats yet</span>
         </div>
       ) : (
-        <div className="card-grid">
-          {props.cards.map((card) => (
-            <SessionCard
-              key={card.id}
-              card={card}
-              isBusy={props.busyCardId === card.id}
-              onArm={() => props.onArm(card.id)}
-              onPause={() => props.onPause(card.id)}
-              onDismiss={() => props.onDismiss(card.id)}
-            />
+        <div className="workspace-card-groups">
+          {groups.map((group) => (
+            <section className="workspace-group" key={group.workspaceId}>
+              <div className="workspace-group-heading">
+                <div>
+                  <h3>{group.workspaceName}</h3>
+                  <p>{group.cards.length} cards</p>
+                </div>
+              </div>
+              <div className="card-grid">
+                {group.cards.map((card) => (
+                  <SessionCard
+                    key={card.id}
+                    card={card}
+                    isBusy={props.busyCardId === card.id}
+                    onArm={() => props.onArm(card.id)}
+                    onResume={() => props.onResume(card.id)}
+                    onPause={() => props.onPause(card.id)}
+                    onReset={() => props.onReset(card.id)}
+                    onKill={() => props.onKill(card.id)}
+                    onDismiss={() => props.onDismiss(card.id)}
+                  />
+                ))}
+              </div>
+            </section>
           ))}
         </div>
       )}
@@ -241,10 +272,20 @@ function SessionCard(props: {
   card: DesktopSessionCard;
   isBusy: boolean;
   onArm: () => void;
+  onResume: () => void;
   onPause: () => void;
+  onReset: () => void;
+  onKill: () => void;
   onDismiss: () => void;
 }): ReactElement {
   const card = props.card;
+  const canPlay = card.canArm || card.canResume;
+  const canPause =
+    card.source === "managed-session" &&
+    !["paused", "complete", "blocked", "needs-human", "uncertain", "error"].includes(
+      card.automationState
+    );
+  const playTitle = card.canResume ? "Resume" : "Arm";
 
   return (
     <article className={`session-card observability-${card.observability}`}>
@@ -281,10 +322,10 @@ function SessionCard(props: {
         <button
           className="icon-button"
           type="button"
-          title="Arm"
-          aria-label={`Arm ${card.workspaceName}`}
-          disabled={!card.canArm || props.isBusy}
-          onClick={props.onArm}
+          title={playTitle}
+          aria-label={`${playTitle} ${card.workspaceName}`}
+          disabled={!canPlay || props.isBusy}
+          onClick={card.canResume ? props.onResume : props.onArm}
         >
           <Play size={17} />
         </button>
@@ -293,13 +334,33 @@ function SessionCard(props: {
           type="button"
           title="Pause"
           aria-label={`Pause ${card.workspaceName}`}
-          disabled={props.isBusy}
+          disabled={!canPause || props.isBusy}
           onClick={props.onPause}
         >
           <Pause size={17} />
         </button>
         <button
+          className="icon-button"
+          type="button"
+          title="Reset"
+          aria-label={`Reset ${card.workspaceName}`}
+          disabled={!card.canReset || props.isBusy}
+          onClick={props.onReset}
+        >
+          <RotateCcw size={17} />
+        </button>
+        <button
           className="icon-button danger"
+          type="button"
+          title="Kill"
+          aria-label={`Kill ${card.workspaceName}`}
+          disabled={!card.canKill || props.isBusy}
+          onClick={props.onKill}
+        >
+          <Square size={15} />
+        </button>
+        <button
+          className="icon-button"
           type="button"
           title="Dismiss"
           aria-label={`Dismiss ${card.workspaceName}`}
@@ -310,6 +371,35 @@ function SessionCard(props: {
         </button>
       </div>
     </article>
+  );
+}
+
+function groupCardsByWorkspace(cards: DesktopSessionCard[]): Array<{
+  workspaceId: string;
+  workspaceName: string;
+  cards: DesktopSessionCard[];
+}> {
+  const groups = new Map<
+    string,
+    { workspaceId: string; workspaceName: string; cards: DesktopSessionCard[] }
+  >();
+
+  for (const card of cards) {
+    const existing = groups.get(card.workspaceId);
+    if (existing) {
+      existing.cards.push(card);
+      continue;
+    }
+
+    groups.set(card.workspaceId, {
+      workspaceId: card.workspaceId,
+      workspaceName: card.workspaceName,
+      cards: [card]
+    });
+  }
+
+  return [...groups.values()].sort((left, right) =>
+    left.workspaceName.localeCompare(right.workspaceName)
   );
 }
 

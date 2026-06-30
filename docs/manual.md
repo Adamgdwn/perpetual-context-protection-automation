@@ -1,5 +1,7 @@
 # Manual
 
+Last updated: 2026-06-29T20:44:55-06:00
+
 ## What This Project Is
 
 Perpetual Context Protection is an installable desktop app with a VS Code
@@ -48,7 +50,10 @@ For material or risk-triggering work, add the full governance path:
 ## Operator Notes
 
 - Use managed sessions for unattended operation.
-- Prefer `Arm All Managed` over trying to control unknown terminals.
+- Use `Arm All` for idle managed sessions. It does not unpause sessions that
+  were paused intentionally.
+- Use per-card Resume, Reset, Kill, Pause, and Dismiss controls when a session
+  needs individual attention.
 - If a session is marked candidate or unsupported, relaunch it through the VS
   Code extension before leaving.
 - Treat `Complete`, `Blocked`, `Needs Human`, and `Uncertain` as stop states.

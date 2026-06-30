@@ -319,9 +319,36 @@ h3 {
 }
 
 .session-toolbar,
-.section-heading {
+.section-heading,
+.workspace-group-heading {
   justify-content: space-between;
   gap: 12px;
+}
+
+.workspace-card-groups {
+  min-height: 0;
+  display: grid;
+  gap: 18px;
+}
+
+.workspace-group {
+  min-width: 0;
+  display: grid;
+  gap: 10px;
+}
+
+.workspace-group-heading {
+  display: flex;
+  align-items: center;
+  min-height: 34px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid #dce2eb;
+}
+
+.workspace-group-heading p {
+  color: #626d7d;
+  font-size: 12px;
+  line-height: 1.35;
 }
 
 .card-grid {
@@ -454,6 +481,7 @@ h3 {
 
 .card-actions {
   display: flex;
+  flex-wrap: wrap;
   justify-content: flex-end;
   gap: 8px;
 }

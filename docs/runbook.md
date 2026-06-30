@@ -1,6 +1,6 @@
 # Runbook
 
-Last updated: 2026-06-29T20:29:52-06:00
+Last updated: 2026-06-29T20:44:55-06:00
 
 ## Purpose
 
@@ -33,12 +33,18 @@ cycles only when detector and idle evidence agree.
 
 - Use `/home/adamgoodwin/Desktop/Perpetual Context Protection.desktop` on this Linux workstation.
 - If the icon needs to be refreshed, run `npm run desktop:install-linux-launcher`.
+- The launcher should show the infinity icon and render the full desktop UI. If
+  it opens blank, run `npm run desktop:smoke` before live testing.
 - Keep automation mode on `Dry Run` for the first observed cycle. Switch to
   `Live` only when Adam is watching and ready to pause.
 
 ## Recovery
 
 - Use the app-level pause control before manual intervention.
+- Use per-card reset when a card's automation state should return to idle
+  without killing the managed terminal.
+- Use per-card kill only for the single managed PTY session that should be
+  stopped.
 - Restart the VS Code extension host if heartbeats stop.
 - Restart the desktop app if the bridge is unhealthy.
 - If automation is uncertain, continue manually in VS Code.

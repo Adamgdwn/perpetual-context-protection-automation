@@ -153,6 +153,191 @@ void test("desktop state exposes cards, logs, and guarded operator actions", asy
   }
 });
 
+void test("desktop controls isolate multiple managed sessions", async () => {
+  const runtime = await startBridgeServer({ port: 0 });
+  try {
+    const firstHeartbeat = createHeartbeat("window-one", "workspace-one", "Workspace One", [
+      {
+        id: "candidate-terminal",
+        name: "Existing Codex",
+        observability: "candidate",
+        profileId: "codex",
+        reason: "Detected by VS Code, but not managed by the bridge."
+      }
+    ]);
+    const secondHeartbeat = createHeartbeat(
+      "window-two",
+      "workspace-two",
+      "Workspace Two",
+      [
+        {
+          id: "unsupported-terminal",
+          name: "Plain Shell",
+          observability: "unsupported",
+          reason: "No supported coding agent detected."
+        }
+      ]
+    );
+
+    await postJson(`${runtime.url}/heartbeat`, firstHeartbeat);
+    await postJson(`${runtime.url}/heartbeat`, secondHeartbeat);
+
+    const firstSession = await postJson<BridgeSessionSummary>(
+      `${runtime.url}/sessions`,
+      {
+        profileId: "echo-proof",
+        workspace: firstHeartbeat.workspace
+      }
+    );
+    const secondSession = await postJson<BridgeSessionSummary>(
+      `${runtime.url}/sessions`,
+      {
+        profileId: "echo-proof",
+        workspace: secondHeartbeat.workspace
+      }
+    );
+
+    const initialState = await getJson<DesktopStateResponse>(
+      `${runtime.url}/desktop/state`
+    );
+    const managedCards = initialState.cards.filter(
+      (card) => card.source === "managed-session"
+    );
+    const candidateCard = initialState.cards.find(
+      (card) => card.id.includes("candidate-terminal")
+    );
+    const unsupportedCard = initialState.cards.find(
+      (card) => card.id.includes("unsupported-terminal")
+    );
+
+    assert.equal(initialState.connection.heartbeatCount, 2);
+    assert.equal(managedCards.length, 2);
+    assert.ok(candidateCard);
+    assert.ok(unsupportedCard);
+    assert.equal(candidateCard.canArm, false);
+    assert.equal(unsupportedCard.canArm, false);
+
+    const armAll = await postJson<DesktopActionResponse>(
+      `${runtime.url}/desktop/arm-all`,
+      {}
+    );
+    assert.deepEqual(
+      new Set(armAll.affectedCardIds),
+      new Set(managedCards.map((card) => card.id))
+    );
+    assert.equal(
+      armAll.state.cards.find((card) => card.id === candidateCard.id)
+        ?.automationState,
+      "idle"
+    );
+    assert.equal(
+      armAll.state.cards.find((card) => card.id === unsupportedCard.id)
+        ?.automationState,
+      "idle"
+    );
+
+    const [firstCard, secondCard] = managedCards;
+    const paused = await postJson<DesktopActionResponse>(
+      `${runtime.url}/desktop/cards/${encodeURIComponent(firstCard.id)}/pause`,
+      {}
+    );
+    assert.equal(
+      paused.state.cards.find((card) => card.id === firstCard.id)
+        ?.automationState,
+      "paused"
+    );
+    assert.equal(
+      paused.state.cards.find((card) => card.id === secondCard.id)
+        ?.automationState,
+      "watching"
+    );
+
+    const armAllAfterPause = await postJson<DesktopActionResponse>(
+      `${runtime.url}/desktop/arm-all`,
+      {}
+    );
+    assert.deepEqual(armAllAfterPause.affectedCardIds, []);
+
+    const resumed = await postJson<DesktopActionResponse>(
+      `${runtime.url}/desktop/cards/${encodeURIComponent(firstCard.id)}/resume`,
+      {}
+    );
+    assert.equal(
+      resumed.state.cards.find((card) => card.id === firstCard.id)
+        ?.automationState,
+      "watching"
+    );
+
+    const reset = await postJson<DesktopActionResponse>(
+      `${runtime.url}/desktop/cards/${encodeURIComponent(firstCard.id)}/reset`,
+      {}
+    );
+    assert.equal(
+      reset.state.cards.find((card) => card.id === firstCard.id)?.automationState,
+      "idle"
+    );
+
+    const kill = await postJson<DesktopActionResponse>(
+      `${runtime.url}/desktop/cards/${encodeURIComponent(secondCard.id)}/kill`,
+      {}
+    );
+    const killedCard = kill.state.cards.find((card) => card.id === secondCard.id);
+    assert.equal(killedCard?.status, "exited");
+    assert.equal(killedCard?.canKill, false);
+
+    const candidateArm = await postJsonResponse(
+      `${runtime.url}/desktop/cards/${encodeURIComponent(candidateCard.id)}/arm`,
+      {}
+    );
+    assert.equal(candidateArm.status, 409);
+    assert.match(candidateArm.text, /cannot be armed/u);
+
+    const candidatePause = await postJsonResponse(
+      `${runtime.url}/desktop/cards/${encodeURIComponent(candidateCard.id)}/pause`,
+      {}
+    );
+    assert.equal(candidatePause.status, 409);
+    assert.match(candidatePause.text, /cannot be paused/u);
+
+    assertEventDetailsInclude(kill.state, secondSession.id, "kill", "exited");
+    assertEventDetailsInclude(reset.state, firstSession.id, "reset", "idle");
+  } finally {
+    await runtime.close();
+  }
+});
+
+function createHeartbeat(
+  windowId: string,
+  workspaceId: string,
+  workspaceName: string,
+  terminals: ExtensionHeartbeat["terminals"]
+): ExtensionHeartbeat {
+  return {
+    protocolVersion: PROTOCOL_VERSION,
+    windowId,
+    extensionVersion: "0.0.1",
+    workspace: {
+      id: workspaceId,
+      name: workspaceName,
+      workspaceFolders: [`file:///${workspaceId}`]
+    },
+    terminals,
+    timestamp: new Date().toISOString()
+  };
+}
+
+function assertEventDetailsInclude(
+  state: DesktopStateResponse,
+  sessionId: string,
+  action: string,
+  result: string
+): void {
+  const details = state.events.flatMap((event) => event.details ?? []);
+  assert.equal(details.includes(`session:${sessionId}`), true);
+  assert.equal(details.includes(`action:${action}`), true);
+  assert.equal(details.includes(`result:${result}`), true);
+}
+
 async function getJson<T>(url: string): Promise<T> {
   const response = await fetch(url);
   const text = await response.text();

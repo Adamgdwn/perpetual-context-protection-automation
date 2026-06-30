@@ -20,7 +20,12 @@ import {
   type AutomatableSession,
   type AutomationRuntimeEvent
 } from "./automationController";
-import { managedCardId, terminalCardId, workspaceCardId } from "./cardIds";
+import {
+  managedCardId,
+  managedSessionIdFromCardId,
+  terminalCardId,
+  workspaceCardId
+} from "./cardIds";
 
 interface DesktopStateActionResult {
   statusCode: number;
@@ -42,7 +47,8 @@ export class DesktopStateStore {
     this.appendEvent({
       kind: "heartbeat",
       message: `Heartbeat received from ${heartbeat.workspace.name}`,
-      workspaceId: heartbeat.workspace.id
+      workspaceId: heartbeat.workspace.id,
+      details: heartbeatEventDetails(heartbeat, "heartbeat", "ok")
     });
   }
 
@@ -51,7 +57,8 @@ export class DesktopStateStore {
       kind: "session-started",
       cardId: managedCardId(session.id),
       workspaceId: session.workspaceId,
-      message: `${displayNameForProfile(session.profileId)} managed session started for ${session.workspaceName}`
+      message: `${displayNameForProfile(session.profileId)} managed session started for ${session.workspaceName}`,
+      details: sessionEventDetails(session, "start", "ok")
     });
   }
 
@@ -61,7 +68,8 @@ export class DesktopStateStore {
       kind: "session-input",
       cardId: managedCardId(session.id),
       workspaceId: session.workspaceId,
-      message: `Input sent to ${displayNameForProfile(session.profileId)} in ${session.workspaceName}`
+      message: `Input sent to ${displayNameForProfile(session.profileId)} in ${session.workspaceName}`,
+      details: sessionEventDetails(session, "input", "ok")
     });
   }
 
@@ -78,7 +86,8 @@ export class DesktopStateStore {
     this.automation.setMode(mode);
     this.appendEvent({
       kind: "automation-mode",
-      message: `Automation mode set to ${mode}`
+      message: `Automation mode set to ${mode}`,
+      details: [`action:automation-mode`, `result:${mode}`]
     });
     return this.actionResponse([], input);
   }
@@ -135,7 +144,34 @@ export class DesktopStateStore {
       cardId: card.id,
       workspaceId: card.workspaceId,
       message: `${card.agentLabel} watching in ${snapshot.mode} mode for ${card.workspaceName}`,
-      affectedCardIds: [card.id]
+      affectedCardIds: [card.id],
+      details: cardEventDetails(card, "arm", snapshot.state)
+    });
+
+    return this.actionResponse([card.id], input);
+  }
+
+  public resumeCard(cardId: string, input: CardBuildInput): DesktopStateActionResult {
+    const card = this.findVisibleCard(cardId, input);
+    if (!card) {
+      return { statusCode: 404, body: { ok: false, error: "Session card not found" } };
+    }
+
+    if (!card.canResume) {
+      return {
+        statusCode: 409,
+        body: { ok: false, error: `${card.status} sessions cannot be resumed` }
+      };
+    }
+
+    const snapshot = this.automation.resumeCard(card.id);
+    this.appendEvent({
+      kind: "session-resumed",
+      cardId: card.id,
+      workspaceId: card.workspaceId,
+      message: `${card.agentLabel} resumed in ${snapshot.mode} mode for ${card.workspaceName}`,
+      affectedCardIds: [card.id],
+      details: cardEventDetails(card, "resume", snapshot.state)
     });
 
     return this.actionResponse([card.id], input);
@@ -147,13 +183,73 @@ export class DesktopStateStore {
       return { statusCode: 404, body: { ok: false, error: "Session card not found" } };
     }
 
+    if (card.source !== "managed-session") {
+      return {
+        statusCode: 409,
+        body: { ok: false, error: `${card.observability} sessions cannot be paused` }
+      };
+    }
+
     this.automation.pauseCard(card.id);
     this.appendEvent({
       kind: "session-paused",
       cardId: card.id,
       workspaceId: card.workspaceId,
       message: `${card.agentLabel} paused for ${card.workspaceName}`,
-      affectedCardIds: [card.id]
+      affectedCardIds: [card.id],
+      details: cardEventDetails(card, "pause", "paused")
+    });
+
+    return this.actionResponse([card.id], input);
+  }
+
+  public resetCard(cardId: string, input: CardBuildInput): DesktopStateActionResult {
+    const card = this.findVisibleCard(cardId, input);
+    if (!card) {
+      return { statusCode: 404, body: { ok: false, error: "Session card not found" } };
+    }
+
+    if (!card.canReset) {
+      return {
+        statusCode: 409,
+        body: { ok: false, error: "Session card is already idle" }
+      };
+    }
+
+    const snapshot = this.automation.resetCard(card.id);
+    this.appendEvent({
+      kind: "session-reset",
+      cardId: card.id,
+      workspaceId: card.workspaceId,
+      message: `${card.agentLabel} automation reset for ${card.workspaceName}`,
+      affectedCardIds: [card.id],
+      details: cardEventDetails(card, "reset", snapshot.state)
+    });
+
+    return this.actionResponse([card.id], input);
+  }
+
+  public killCard(cardId: string, input: CardBuildInput): DesktopStateActionResult {
+    const card = this.findVisibleCard(cardId, input);
+    if (!card) {
+      return { statusCode: 404, body: { ok: false, error: "Session card not found" } };
+    }
+
+    if (card.source !== "managed-session") {
+      return {
+        statusCode: 409,
+        body: { ok: false, error: `${card.observability} sessions cannot be killed` }
+      };
+    }
+
+    this.automation.resetCard(card.id);
+    this.appendEvent({
+      kind: "session-killed",
+      cardId: card.id,
+      workspaceId: card.workspaceId,
+      message: `${card.agentLabel} kill requested for ${card.workspaceName}`,
+      affectedCardIds: [card.id],
+      details: cardEventDetails(card, "kill", "exited")
     });
 
     return this.actionResponse([card.id], input);
@@ -172,7 +268,8 @@ export class DesktopStateStore {
       cardId: card.id,
       workspaceId: card.workspaceId,
       message: `${card.agentLabel} dismissed for ${card.workspaceName}`,
-      affectedCardIds: [card.id]
+      affectedCardIds: [card.id],
+      details: cardEventDetails(card, "dismiss", "hidden")
     });
 
     return this.actionResponse([card.id], input);
@@ -193,7 +290,13 @@ export class DesktopStateStore {
         affectedCardIds.length === 0
           ? "Arm All found no managed sessions"
           : `Arm All armed ${affectedCardIds.length} managed session${affectedCardIds.length === 1 ? "" : "s"}`,
-      affectedCardIds
+      affectedCardIds,
+      details:
+        eligibleCards.length === 0
+          ? ["action:arm-all", "result:none"]
+          : eligibleCards.flatMap((card) =>
+              cardEventDetails(card, "arm-all", "watching")
+            )
     });
 
     return this.actionResponse(affectedCardIds, input);
@@ -260,8 +363,13 @@ export class DesktopStateStore {
       status: statusForManagedSession(session.status, automationState),
       automationState,
       automationMode: automationSnapshot.mode,
-      canArm: session.status !== "exited",
-      canArmAll: session.status !== "exited",
+      canArm: session.status !== "exited" && automationState === "idle",
+      canArmAll: session.status !== "exited" && automationState === "idle",
+      canResume:
+        session.status !== "exited" &&
+        (automationState === "paused" || automationState === "dry-run-ready"),
+      canReset: automationState !== "idle",
+      canKill: session.status !== "exited",
       reason: "Managed bridge session with controlled PTY read/write.",
       lastEvent: latestEvent.message,
       lastEventAt: latestEvent.timestamp,
@@ -293,8 +401,11 @@ export class DesktopStateStore {
       status: statusForObservedTerminal(terminal.observability, automationState),
       automationState,
       automationMode: automationSnapshot.mode,
-      canArm: terminal.observability === "managed",
-      canArmAll: terminal.observability === "managed",
+      canArm: false,
+      canArmAll: false,
+      canResume: false,
+      canReset: automationState !== "idle",
+      canKill: false,
       reason: terminal.reason,
       lastEvent: latestEvent.message,
       lastEventAt: latestEvent.timestamp,
@@ -322,6 +433,9 @@ export class DesktopStateStore {
       automationMode: automationSnapshot.mode,
       canArm: false,
       canArmAll: false,
+      canResume: false,
+      canReset: automationState !== "idle",
+      canKill: false,
       reason: "VS Code window heartbeat received; no managed coder terminal reported yet.",
       lastEvent: latestEvent.message,
       lastEventAt: latestEvent.timestamp,
@@ -398,4 +512,55 @@ function latestTimestamp(timestamps: string[]): string | undefined {
     .filter((timestamp) => !Number.isNaN(Date.parse(timestamp)))
     .sort()
     .at(-1);
+}
+
+function heartbeatEventDetails(
+  heartbeat: ExtensionHeartbeat,
+  action: string,
+  result: string
+): string[] {
+  return [
+    `window:${heartbeat.windowId}`,
+    `workspace:${heartbeat.workspace.name}`,
+    `workspaceId:${heartbeat.workspace.id}`,
+    `terminals:${heartbeat.terminals.length}`,
+    `action:${action}`,
+    `result:${result}`
+  ];
+}
+
+function sessionEventDetails(
+  session: BridgeSessionSummary,
+  action: string,
+  result: string
+): string[] {
+  const cardId = managedCardId(session.id);
+  return [
+    `session:${session.id}`,
+    `card:${cardId}`,
+    `workspace:${session.workspaceName}`,
+    `workspaceId:${session.workspaceId}`,
+    `agent:${displayNameForProfile(session.profileId)}`,
+    `action:${action}`,
+    `result:${result}`
+  ];
+}
+
+function cardEventDetails(
+  card: DesktopSessionCard,
+  action: string,
+  result: string
+): string[] {
+  const sessionId = managedSessionIdFromCardId(card.id);
+  return [
+    ...(sessionId ? [`session:${sessionId}`] : []),
+    `card:${card.id}`,
+    `workspace:${card.workspaceName}`,
+    `workspaceId:${card.workspaceId}`,
+    `agent:${card.agentLabel}`,
+    `source:${card.source}`,
+    `observability:${card.observability}`,
+    `action:${action}`,
+    `result:${result}`
+  ];
 }

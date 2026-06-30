@@ -1,7 +1,7 @@
 # Current Build Pathway
 
-Last Updated: 2026-06-29T20:29:52-06:00
-Status: Chunk Four implementation checkpoint - manual live cycle pending
+Last Updated: 2026-06-29T20:44:55-06:00
+Status: Chunk Five draft controls added - manual live and two-session evidence pending
 Owner: Technical Lead
 
 > **Single active pathway document.** This is the live path from planning to a
@@ -65,8 +65,8 @@ human decision.
 | Chunk One - VS Code integration spike | done | 2026-06-29T19:18:45-06:00 | build agent | Bridge-owned `node-pty` path proved on Linux; Windows validation handoff recorded |
 | Chunk Two - Desktop shell and session cards | done | 2026-06-29T19:37:10-06:00 | build agent | Electron desktop shell, bridge desktop state, session cards, logs, and guarded operator actions |
 | Chunk Three - Agent profiles and signal detector | done | 2026-06-29T20:11:30-06:00 | build agent | Claude/Codex profiles, multi-signal boundary detection |
-| Chunk Four - One managed compact cycle | active | 2026-06-29T20:29:52-06:00 | build agent | State machine, dry-run/live mode, desktop launcher, and automated validation complete; manual live cycle pending |
-| Chunk Five - Multi-session arm/pause/all control | pending | - | build agent | Multiple session cards, operator approvals, logs |
+| Chunk Four - One managed compact cycle | validation pending | 2026-06-29T20:29:52-06:00 | build agent | State machine, dry-run/live mode, desktop launcher, and automated validation complete; manual live cycle pending |
+| Chunk Five - Multi-session arm/pause/all control | active | 2026-06-29T20:44:55-06:00 | build agent | Workspace grouping, per-card resume/reset/kill controls, safer arm-all, and identity-rich logs added; manual two-session evidence pending |
 | Chunk Six - Windows/Linux packaging | pending | - | build agent | Installable app + extension setup |
 | Chunk Seven - Public release hardening | pending | - | build agent | Docs, examples, security notes, GitHub release path |
 
@@ -333,7 +333,7 @@ compact command.
 
 ## Chunk Four - One Managed Compact Cycle
 
-Status: active
+Status: validation pending
 
 Completion target: Integration complete
 
@@ -385,6 +385,7 @@ Implementation evidence:
 - 2026-06-29T20:29:52-06:00: Added automated coverage for dry-run "would compact" logging, live compact command gating, quiet-period resume gating, double-fire prevention, terminal stop states, and pause-before/pause-during behavior.
 - 2026-06-29T20:29:52-06:00: Desktop cards now show automation mode and last detector decision; event log entries include detector evidence details.
 - 2026-06-29T20:29:52-06:00: Added Linux launcher scripts and installed a desktop icon at `/home/adamgoodwin/Desktop/Perpetual Context Protection.desktop`.
+- 2026-06-29T20:44:55-06:00: Changed the installed launcher and in-app brand mark to an infinity symbol, fixed Electron `file://` renderer asset loading by using a relative Vite base, and upgraded `desktop:smoke` to fail if the app shell text does not render.
 - 2026-06-29T20:29:52-06:00: `npm test` passed with 15 unit tests.
 - 2026-06-29T20:29:52-06:00: `npm run lint` passed.
 - 2026-06-29T20:29:52-06:00: `npm run build` passed.
@@ -402,7 +403,7 @@ unsafe injections. Capture logs and revise detector before continuing.
 
 ## Chunk Five - Multi-Session Arm/Pause/All Control
 
-Status: planned
+Status: active
 
 Completion target: Integration complete
 
@@ -426,13 +427,14 @@ Outputs:
 
 Acceptance criteria:
 
-- [ ] App shows multiple detected VS Code windows
-- [ ] App shows multiple managed coder sessions
-- [ ] Operator can arm one session or all eligible sessions
-- [ ] One session entering `Blocked` does not pause unrelated sessions
-- [ ] Logs clearly identify session id, workspace, agent, action, and result
-- [ ] Session cards show complete, blocked, needs-human, paused, compacting, resuming, and error states
-- [ ] No command is sent to candidate/unsupported sessions
+- [x] App shows multiple detected VS Code windows
+- [x] App shows multiple managed coder sessions
+- [x] Operator can arm one session or all eligible sessions
+- [x] One session entering `Blocked` does not pause unrelated sessions
+- [x] Logs clearly identify session id, workspace, agent, action, and result
+- [x] Session cards show complete, blocked, needs-human, paused, compacting, resuming, and error states
+- [x] No command is sent to candidate/unsupported sessions
+- [ ] Manual two-session run evidence is recorded while Adam watches
 
 Validation:
 
@@ -442,6 +444,22 @@ npm test
 npm run build
 # manual two-session run evidence recorded here
 ```
+
+Implementation evidence:
+
+- 2026-06-29T20:44:55-06:00: Added workspace-grouped session cards so multiple VS Code windows and sessions are easier to follow.
+- 2026-06-29T20:44:55-06:00: Added explicit per-card resume, reset, kill, pause, dismiss, and arm controls. `Arm All` now only arms idle bridge-managed sessions and does not silently unpause paused sessions.
+- 2026-06-29T20:44:55-06:00: Added bridge action routes for resume/reset/kill and reverse managed-card session lookup so kill targets only one managed PTY.
+- 2026-06-29T20:44:55-06:00: Event details now include session id, card id, workspace, agent, action, and result for managed-session actions and automation events.
+- 2026-06-29T20:44:55-06:00: Added automated multi-session coverage for two VS Code windows, two managed sessions, `Arm All`, pause/resume/reset/kill, candidate/unsupported safety, identity-rich logs, and blocked-session isolation.
+- 2026-06-29T20:44:55-06:00: `npm test` passed with 17 unit tests.
+- 2026-06-29T20:44:55-06:00: `npm run lint` passed.
+- 2026-06-29T20:44:55-06:00: `npm run build` passed.
+- 2026-06-29T20:44:55-06:00: `npm run desktop:smoke` passed under `xvfb`; the smoke hook now verifies rendered desktop shell text. Headless DBus warnings only.
+
+Close-out state: Draft complete for Chunk Five controls. Remaining integration
+evidence is a human-observed two-session run after the Chunk Four live-cycle
+manual test is safe to perform.
 
 Stop condition: Stop if multiple sessions cause ambiguous ownership, mixed logs,
 or accidental cross-session command sends.
@@ -585,12 +603,18 @@ sole reason to inject text.
 | 2026-06-29T20:29:52-06:00 | `npm run build` | pass | TypeScript compile and desktop renderer production build passed. |
 | 2026-06-29T20:29:52-06:00 | `npm run desktop:smoke` | pass | Electron loaded under `xvfb`; headless DBus warnings only. |
 | 2026-06-29T20:29:52-06:00 | `npm run test:vscode` | pass | VS Code extension-host test passed under `xvfb`. |
+| 2026-06-29T20:44:55-06:00 | `npm test` | pass | 17 unit tests, including multi-session operator controls and blocked-session isolation. |
+| 2026-06-29T20:44:55-06:00 | `npm run lint` | pass | ESLint passed for source, tests, and Vite config. |
+| 2026-06-29T20:44:55-06:00 | `npm run build` | pass | TypeScript compile and desktop renderer production build passed with relative Electron asset paths. |
+| 2026-06-29T20:44:55-06:00 | `npm run desktop:smoke` | pass | Electron rendered the desktop shell text under `xvfb`; headless DBus warnings only. |
 
 ## Next Handoff
 
-Continue Chunk Four with a human-observed managed session test. Adam can launch
-the desktop app from `/home/adamgoodwin/Desktop/Perpetual Context Protection.desktop`.
-Use dry-run mode first, start or attach one managed Claude/Codex session through
-the VS Code companion extension, verify the event log records detector evidence
-and "would compact", then switch to live mode only when Adam is watching and
-ready to pause if needed.
+Continue with human-observed integration evidence. Adam can launch the desktop
+app from `/home/adamgoodwin/Desktop/Perpetual Context Protection.desktop`; the
+launcher now uses the infinity icon and the renderer asset-path bug has been
+fixed. Use dry-run mode first, start or attach one managed Claude/Codex session
+through the VS Code companion extension, verify the event log records detector
+evidence and "would compact", then switch to live mode only when Adam is
+watching and ready to pause if needed. After the one-session live cycle is
+verified, run a two-session observed pass for Chunk Five.

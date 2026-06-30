@@ -13,6 +13,7 @@ import {
   type StartSessionRequest
 } from "../shared/protocol";
 import { DesktopStateStore } from "./desktopState";
+import { managedSessionIdFromCardId } from "./cardIds";
 import { ManagedPtySession } from "./managedPtySession";
 
 export interface BridgeServerOptions {
@@ -228,7 +229,7 @@ async function handleRequest(
     }
 
     const desktopActionMatch = url.pathname.match(
-      /^\/desktop\/cards\/([^/]+)\/(arm|pause|dismiss)$/u
+      /^\/desktop\/cards\/([^/]+)\/(arm|resume|pause|reset|kill|dismiss)$/u
     );
     if (request.method === "POST" && desktopActionMatch) {
       const cardId = decodeURIComponent(desktopActionMatch[1]);
@@ -238,8 +239,30 @@ async function handleRequest(
         sendDesktopAction(response, state.desktop.armCard(cardId, input));
         return;
       }
+      if (action === "resume") {
+        sendDesktopAction(response, state.desktop.resumeCard(cardId, input));
+        return;
+      }
       if (action === "pause") {
         sendDesktopAction(response, state.desktop.pauseCard(cardId, input));
+        return;
+      }
+      if (action === "reset") {
+        sendDesktopAction(response, state.desktop.resetCard(cardId, input));
+        return;
+      }
+      if (action === "kill") {
+        const sessionId = managedSessionIdFromCardId(cardId);
+        const session = sessionId ? state.sessions.get(sessionId) : undefined;
+        if (!session) {
+          sendJson(response, 404, {
+            ok: false,
+            error: "Managed session not found"
+          });
+          return;
+        }
+        session.stop();
+        sendDesktopAction(response, state.desktop.killCard(cardId, desktopInput(state)));
         return;
       }
       sendDesktopAction(response, state.desktop.dismissCard(cardId, input));

@@ -1,6 +1,6 @@
 # Architecture Overview
 
-Last Updated: 2026-06-29T18:37:53-06:00
+Last Updated: 2026-06-29T20:44:55-06:00
 
 ## Summary
 
@@ -20,14 +20,14 @@ tmux and n8n are optional future adapters, not the v1 foundation.
 ```text
 Desktop app
   - full window control panel
-  - session cards, logs, arm/pause/all controls
+  - workspace-grouped session cards, logs, arm/resume/pause/reset/kill/all controls
   - pause-boundary detector and compact/resume state machine
   - local config, session event log, agent profiles
 
 Local bridge
   - localhost HTTP/WebSocket channel
   - desktop app accepts heartbeats from VS Code extension instances
-  - extension receives arm/pause/compact/resume commands from desktop app
+  - extension-owned managed sessions receive compact/resume text through the bridge
 
 VS Code companion extension
   - runs inside each VS Code window where installed
@@ -96,7 +96,8 @@ Important rules:
   explicitly resumes or resets the session.
 - If the detector is uncertain, the session becomes `NeedsHuman`; it does not
   guess and inject commands.
-- `Arm All` applies only to managed or explicitly adopted sessions.
+- `Arm All` applies only to idle managed or explicitly adopted sessions; paused
+  sessions require an explicit resume.
 
 ## Key Decisions
 

@@ -1,6 +1,5 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" role="img" aria-label="Perpetual Context Protection">
   <rect width="128" height="128" rx="24" fill="#102a43"/>
-  <path d="M64 18 101 34v25c0 27-15 47-37 57-22-10-37-30-37-57V34l37-16Z" fill="#dff7f4"/>
-  <path d="M64 29 90 40v19c0 20-10 34-26 43-16-9-26-23-26-43V40l26-11Z" fill="#146c5d"/>
-  <path d="M49 66c0-8 6-15 15-15h4l-7-7 6-6 18 18-18 18-6-6 7-7h-4c-4 0-7 3-7 7s3 7 7 7h18v9H64c-9 0-15-7-15-18Z" fill="#ffffff"/>
+  <path d="M28 76c20 0 28-32 48-32a16 16 0 0 1 0 32c-20 0-28-32-48-32a16 16 0 1 0 0 32Z" fill="none" stroke="#dff7f4" stroke-width="13" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M28 76c20 0 28-32 48-32a16 16 0 0 1 0 32c-20 0-28-32-48-32a16 16 0 1 0 0 32Z" fill="none" stroke="#2dd4bf" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
 </svg>

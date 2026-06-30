@@ -9,7 +9,10 @@ const defaultBridgeUrl = "http://127.0.0.1:47320";
 export interface DesktopApi {
   getState: () => Promise<DesktopStateResponse>;
   armCard: (cardId: string) => Promise<DesktopActionResponse>;
+  resumeCard: (cardId: string) => Promise<DesktopActionResponse>;
   pauseCard: (cardId: string) => Promise<DesktopActionResponse>;
+  resetCard: (cardId: string) => Promise<DesktopActionResponse>;
+  killCard: (cardId: string) => Promise<DesktopActionResponse>;
   dismissCard: (cardId: string) => Promise<DesktopActionResponse>;
   armAll: () => Promise<DesktopActionResponse>;
   setAutomationMode: (mode: SessionAutomationMode) => Promise<DesktopActionResponse>;
@@ -27,9 +30,24 @@ export function createDesktopApi(): DesktopApi {
         `/desktop/cards/${encodeURIComponent(cardId)}/arm`,
         "POST"
       ),
+    resumeCard: (cardId) =>
+      requestBridge<DesktopActionResponse>(
+        `/desktop/cards/${encodeURIComponent(cardId)}/resume`,
+        "POST"
+      ),
     pauseCard: (cardId) =>
       requestBridge<DesktopActionResponse>(
         `/desktop/cards/${encodeURIComponent(cardId)}/pause`,
+        "POST"
+      ),
+    resetCard: (cardId) =>
+      requestBridge<DesktopActionResponse>(
+        `/desktop/cards/${encodeURIComponent(cardId)}/reset`,
+        "POST"
+      ),
+    killCard: (cardId) =>
+      requestBridge<DesktopActionResponse>(
+        `/desktop/cards/${encodeURIComponent(cardId)}/kill`,
         "POST"
       ),
     dismissCard: (cardId) =>

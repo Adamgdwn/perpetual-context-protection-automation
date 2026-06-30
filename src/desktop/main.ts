@@ -52,6 +52,7 @@ async function createMainWindow(): Promise<void> {
     minWidth: 920,
     minHeight: 640,
     backgroundColor: "#f5f6f8",
+    icon: resolveDesktopIconPath(),
     title: "Perpetual Context Protection",
     webPreferences: {
       preload: join(__dirname, "preload.js"),
@@ -63,7 +64,24 @@ async function createMainWindow(): Promise<void> {
 
   if (shouldQuitAfterLoad) {
     mainWindow.webContents.once("did-finish-load", () => {
-      setTimeout(() => app.quit(), 500);
+      void verifyDesktopSmoke(mainWindow);
+    });
+    mainWindow.webContents.once(
+      "did-fail-load",
+      (_event, errorCode, errorDescription, validatedUrl) => {
+        process.stderr.write(
+          `Desktop smoke load failed (${errorCode}) ${errorDescription}: ${validatedUrl}\n`
+        );
+        process.exitCode = 1;
+        app.quit();
+      }
+    );
+    mainWindow.webContents.on("render-process-gone", (_event, details) => {
+      process.stderr.write(
+        `Desktop smoke renderer exited unexpectedly: ${details.reason}\n`
+      );
+      process.exitCode = 1;
+      app.quit();
     });
   }
 
@@ -81,6 +99,57 @@ function resolveRendererIndexPath(): string {
     return preferredPath;
   }
   return join(__dirname, "../../desktop/renderer/desktop/index.html");
+}
+
+function resolveDesktopIconPath(): string {
+  return join(__dirname, "../../../assets/pcpa-icon.svg");
+}
+
+async function verifyDesktopSmoke(window: BrowserWindow | undefined): Promise<void> {
+  if (!window) {
+    process.stderr.write("Desktop smoke failed: main window was not created.\n");
+    process.exitCode = 1;
+    app.quit();
+    return;
+  }
+
+  const deadline = Date.now() + 5000;
+  let lastBodyText = "";
+
+  while (Date.now() < deadline) {
+    const result = (await window.webContents.executeJavaScript(
+      `(() => {
+        const shell = document.querySelector(".app-shell");
+        return {
+          hasShell: Boolean(shell),
+          bodyText: document.body?.innerText ?? ""
+        };
+      })()`,
+      true
+    )) as { hasShell: boolean; bodyText: string };
+
+    lastBodyText = result.bodyText;
+    if (
+      result.hasShell &&
+      result.bodyText.includes("Perpetual Context Protection")
+    ) {
+      process.exitCode = 0;
+      app.quit();
+      return;
+    }
+
+    await sleep(100);
+  }
+
+  process.stderr.write(
+    `Desktop smoke failed: renderer shell did not appear. Body text: ${lastBodyText}\n`
+  );
+  process.exitCode = 1;
+  app.quit();
+}
+
+function sleep(ms: number): Promise<void> {
+  return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
 async function startDesktopBridge(): Promise<BridgeRuntime | undefined> {
@@ -128,7 +197,7 @@ function isAllowedDesktopActionPath(path: string): boolean {
   return (
     path === "/desktop/arm-all" ||
     /^\/desktop\/automation-mode\/(?:dry-run|live)$/u.test(path) ||
-    /^\/desktop\/cards\/[^/]+\/(?:arm|pause|dismiss)$/u.test(path)
+    /^\/desktop\/cards\/[^/]+\/(?:arm|resume|pause|reset|kill|dismiss)$/u.test(path)
   );
 }
 

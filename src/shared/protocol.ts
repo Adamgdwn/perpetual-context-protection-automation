@@ -54,7 +54,10 @@ export type DesktopEventKind =
   | "session-started"
   | "session-input"
   | "session-armed"
+  | "session-resumed"
   | "session-paused"
+  | "session-reset"
+  | "session-killed"
   | "session-dismissed"
   | "arm-all"
   | "automation-mode"
@@ -135,6 +138,9 @@ export interface DesktopSessionCard {
   automationMode: SessionAutomationMode;
   canArm: boolean;
   canArmAll: boolean;
+  canResume: boolean;
+  canReset: boolean;
+  canKill: boolean;
   reason: string;
   lastEvent: string;
   lastEventAt: string;

@@ -84,6 +84,38 @@ void test("terminal stop states do not send compact commands", () => {
   assert.equal(events.some((event) => event.kind === "automation-stop"), true);
 });
 
+void test("one blocked session does not pause unrelated sessions", () => {
+  const controller = new AutomationController();
+  const blockedSession = new FakeSession(signalSamples.blocked, "blocked-session");
+  const boundarySession = new FakeSession(
+    signalSamples.explicitChunkDone,
+    "boundary-session"
+  );
+  controller.setMode("live");
+  controller.armCard(managedCardId(blockedSession.id));
+  controller.armCard(managedCardId(boundarySession.id));
+
+  const events = controller.evaluateSessions(
+    [blockedSession, boundarySession],
+    signalSampleTimes.now
+  );
+
+  assert.equal(blockedSession.sentLines.length, 0);
+  assert.deepEqual(boundarySession.sentLines, [
+    boundarySession.profile.compactCommand
+  ]);
+  assert.equal(
+    controller.getSnapshot(managedCardId(blockedSession.id)).state,
+    "blocked"
+  );
+  assert.equal(
+    controller.getSnapshot(managedCardId(boundarySession.id)).state,
+    "compacting"
+  );
+  assert.equal(events.some((event) => event.cardId === managedCardId(blockedSession.id)), true);
+  assert.equal(events.some((event) => event.cardId === managedCardId(boundarySession.id)), true);
+});
+
 void test("pause suppresses watching and compact-resume sends", () => {
   const controller = new AutomationController();
   const session = new FakeSession(signalSamples.explicitChunkDone);
@@ -115,14 +147,16 @@ void test("pause suppresses watching and compact-resume sends", () => {
 });
 
 class FakeSession implements AutomatableSession {
-  public readonly id = "fake-session";
   public readonly profile: ResolvedAgentProfile = resolveAgentProfile("codex");
   public status: BridgeSessionSummary["status"] = "running";
   public output: string;
   public lastOutputAt: string | undefined = new Date(signalSampleTimes.idle).toISOString();
   public readonly sentLines: string[] = [];
 
-  public constructor(output: string) {
+  public constructor(
+    output: string,
+    public readonly id = "fake-session"
+  ) {
     this.output = output;
   }
 
