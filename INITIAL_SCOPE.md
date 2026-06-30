@@ -1,7 +1,7 @@
 # Initial Scope - Perpetual Context Protection Automation
 
 Generated: 2026-06-29T18:04:01-06:00
-Revised: 2026-06-29T18:37:53-06:00
+Revised: 2026-06-29T18:55:26-06:00
 
 ## Classification
 
@@ -9,13 +9,13 @@ Revised: 2026-06-29T18:37:53-06:00
 |----------------|-------|
 | Project name   | Perpetual Context Protection Automation |
 | Public slug    | perpetual-context-protection-automation |
-| Current local dir | perpetual-contex-protection-automation |
+| Current local dir | perpetual-context-protection-automation |
 | Type           | automation |
 | Governance     | 1 |
 | Risk tier      | low |
 | Stack          | TypeScript desktop app / VS Code extension |
 | Primary model  | hybrid |
-| Location       | /home/adamgoodwin/code/Applications/perpetual-contex-protection-automation |
+| Location       | /home/adamgoodwin/code/Applications/perpetual-context-protection-automation |
 
 ## Build approach
 

@@ -1,36 +1,26 @@
 # Start Here
 
-Last Updated: 2026-06-29T18:44:57-06:00
-Status: pushed - ready for local folder rename and reopen
+Last Updated: 2026-06-29T18:55:26-06:00
+Status: Chunk Zero path cleanup complete - ready for Chunk One
 Owner: Adam Goodwin
 
-## 2026-06-29 Turnover For Next Session
+## 2026-06-29 Chunk Zero Completion Handoff
 
-Adam is about to close this window, rename the local folder to fix the typo, and
-reopen the project.
-
-Current local folder:
-
-```text
-/home/adamgoodwin/code/Applications/perpetual-contex-protection-automation
-```
-
-Intended corrected local folder and public GitHub repo:
+The local folder rename cleanup is complete. Use the corrected local folder and
+public GitHub repo:
 
 ```text
 /home/adamgoodwin/code/Applications/perpetual-context-protection-automation
 https://github.com/Adamgdwn/perpetual-context-protection-automation
 ```
 
-Resume rule after reopen:
+Resume rule for the next implementation session:
 
-1. Start in the corrected folder path if Adam has renamed it.
+1. Start in the corrected folder path.
 2. Run `git status --short`.
 3. Read this file and `docs/current-build-pathway.md`.
 4. Do not restart from the superseded tmux/n8n plan in `PLAN.md`.
-5. Finish the local-path cleanup items below if Adam has just renamed the
-   folder.
-6. Then start Chunk One, the VS Code integration spike.
+5. Start Chunk One, the VS Code integration spike.
 
 Most important product decision:
 
@@ -101,23 +91,14 @@ Committed and pushed state:
   `32637f0 Initial VS Code-first planning scaffold`.
 - Main has been pushed and tracks `origin/main`.
 
-Remaining Chunk Zero cleanup after Adam renames the folder:
+Chunk Zero cleanup completed:
 
-- Confirm `pwd` is
+- Confirmed `pwd` is
   `/home/adamgoodwin/code/Applications/perpetual-context-protection-automation`.
-- Run `git status --short` and confirm the working tree is clean before
-  starting implementation.
-- Update any durable path references that still mention the temporary typo path
-  if they should now point to the corrected folder. Search with:
-
-```bash
-rg -n "perpetual-contex|Contex" README.md START_HERE.md INITIAL_SCOPE.md project-control.yaml docs -g '*.md' -g '*.yaml'
-```
-
-- Expected remaining typo references before cleanup are the historical/current
-  local-path notes in `INITIAL_SCOPE.md` and possibly this turnover section.
-- After path cleanup, commit and push that small update before starting Chunk
-  One.
+- Confirmed `origin` points to Adam's public GitHub repo.
+- Updated durable path references that still mentioned the temporary typo path.
+- Updated `docs/current-build-pathway.md` so Chunk One is the active next slice.
+- Close-out validation is recorded in `docs/current-build-pathway.md`.
 
 ## Current Plan
 
@@ -132,8 +113,7 @@ and architecture plan. `PLAN.md` is retained as superseded tmux/n8n research.
 
 Current priorities:
 
-- **Finish Chunk Zero path cleanup** - local folder rename and typo-path doc cleanup after reopen
-- **Then Chunk One** - VS Code integration spike and reliable terminal I/O proof
+- **Start Chunk One** - VS Code integration spike and reliable terminal I/O proof
 - Build VS Code-first, coder-agnostic behavior before optional tmux or n8n adapters
 - Treat terminal observability as explicit session metadata: managed, adoptable, or unsupported
 - Use multi-signal pause detection, not a single required `===CHUNK_DONE===` phrase

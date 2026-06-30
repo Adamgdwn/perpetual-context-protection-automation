@@ -1,7 +1,7 @@
 # Current Build Pathway
 
-Last Updated: 2026-06-29T18:37:53-06:00
-Status: draft - VS Code-first path
+Last Updated: 2026-06-29T18:55:26-06:00
+Status: Chunk Zero complete - Chunk One active
 Owner: Technical Lead
 
 > **Single active pathway document.** This is the live path from planning to a
@@ -61,8 +61,8 @@ human decision.
 | Step | Status | Timestamp | Owner | Notes |
 |---|---|---|---|---|
 | Planning revision | done | 2026-06-29T18:37:53-06:00 | Adam + Codex | VS Code-first desktop app + extension direction confirmed |
-| Chunk Zero - Repo and public project setup | active | 2026-06-29T18:37:53-06:00 | build agent | Initialize Git, corrected repo name, public GitHub remote |
-| Chunk One - VS Code integration spike | pending | - | build agent | Prove reliable terminal read/write path |
+| Chunk Zero - Repo and public project setup | done | 2026-06-29T18:55:26-06:00 | build agent | Git initialized, public remote pushed, corrected local path cleanup complete |
+| Chunk One - VS Code integration spike | active | 2026-06-29T18:55:26-06:00 | build agent | Prove reliable terminal read/write path |
 | Chunk Two - Desktop shell and session cards | pending | - | build agent | Full window UI and extension bridge |
 | Chunk Three - Agent profiles and signal detector | pending | - | build agent | Claude/Codex profiles, multi-signal boundary detection |
 | Chunk Four - One managed compact cycle | pending | - | build agent | Safe dry-run then live compact/resume for one session |
@@ -72,7 +72,7 @@ human decision.
 
 ## Chunk Zero - Repo And Public Project Setup
 
-Status: active
+Status: done
 
 Completion target: Task complete
 
@@ -97,12 +97,12 @@ Outputs:
 
 Acceptance criteria:
 
-- [ ] `git status --short` works from repo root
-- [ ] remote `origin` points to Adam's public GitHub repo
-- [ ] repo name uses `context`, not `contex`
-- [ ] initial commit includes planning docs and governance scaffold
-- [ ] README states the VS Code-first product direction
-- [ ] `project-control.yaml` matches the corrected repo/product name or records the temporary local-path exception
+- [x] `git status --short` works from repo root
+- [x] remote `origin` points to Adam's public GitHub repo
+- [x] repo name uses `context`, not the typo spelling
+- [x] initial commit includes planning docs and governance scaffold
+- [x] README states the VS Code-first product direction
+- [x] `project-control.yaml` matches the corrected repo/product name
 
 Validation:
 
@@ -112,17 +112,23 @@ git remote -v
 bash scripts/governance-preflight.sh
 ```
 
+Evidence:
+
+- 2026-06-29T18:55:26-06:00: `git status --short` worked from repo root and showed only planned documentation cleanup before commit.
+- 2026-06-29T18:55:26-06:00: `git remote -v` confirmed `origin` points to `https://github.com/Adamgdwn/perpetual-context-protection-automation.git`.
+- 2026-06-29T18:55:26-06:00: strict typo-path search across `README.md`, `START_HERE.md`, `INITIAL_SCOPE.md`, `project-control.yaml`, and `docs/` returned no stale local-path matches.
+- 2026-06-29T18:55:26-06:00: `bash scripts/governance-preflight.sh` passed with 0 warnings.
+
 Stop condition: Stop if GitHub authentication, repo visibility, or local
 directory rename requires Adam's decision.
 
-Next action: Initialize Git and create the public GitHub repo after Adam confirms
-the exact GitHub owner/remote path or provides the remote.
+Next action: Start Chunk One and prove the VS Code terminal read/write path.
 
 ---
 
 ## Chunk One - VS Code Integration Spike
 
-Status: planned
+Status: active
 
 Completion target: Draft complete
 

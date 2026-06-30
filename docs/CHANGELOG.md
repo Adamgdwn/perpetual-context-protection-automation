@@ -4,6 +4,13 @@
 
 - Implementation not yet started. See `docs/current-build-pathway.md`.
 
+## 2026-06-29 - Chunk Zero Path Cleanup
+
+- Completed local path cleanup for the corrected `perpetual-context-protection-automation` slug.
+- Updated the active pathway so Chunk Zero is complete and Chunk One is the next implementation slice.
+- Removed stale notes that said the local directory still needed rename cleanup.
+- Re-ran Chunk Zero close-out validation; governance preflight passed with 0 warnings.
+
 ## 2026-06-29 - VS Code-First Planning Revision
 
 - Revised product direction from tmux/n8n-first watcher to cross-platform desktop app plus VS Code companion extension.
@@ -11,7 +18,7 @@
 - Rebuilt `docs/current-build-pathway.md` into token-friendly implementation chunks from repo setup through public release hardening.
 - Added session-card, observability-level, agent-profile, and multi-signal detector language.
 - Marked `PLAN.md` as superseded research rather than the active implementation route.
-- Corrected public repo/product spelling to `perpetual-context-protection-automation`; current local directory still needs Chunk Zero cleanup.
+- Corrected public repo/product spelling to `perpetual-context-protection-automation`; queued local directory cleanup for Chunk Zero.
 
 ## 2026-06-29 - Planning Complete
 

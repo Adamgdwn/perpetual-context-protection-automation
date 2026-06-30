@@ -6,7 +6,7 @@ use_case:
     - AI agent tooling
     - Desktop application
     - VS Code extension
-  notes: Use-case classification informs controls but does not override selected risk_tier or governance_level. Current local directory still contains the old contex typo until Chunk Zero handles repo setup or documents an exception.
+  notes: Use-case classification informs controls but does not override selected risk_tier or governance_level. Chunk Zero path cleanup completed 2026-06-29; local directory and public repo use perpetual-context-protection-automation.
 risk_tier: low
 governance_level: 1
 repository_model: single-repo
