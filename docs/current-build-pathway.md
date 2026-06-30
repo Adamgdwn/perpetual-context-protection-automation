@@ -386,6 +386,7 @@ Implementation evidence:
 - 2026-06-29T20:29:52-06:00: Desktop cards now show automation mode and last detector decision; event log entries include detector evidence details.
 - 2026-06-29T20:29:52-06:00: Added Linux launcher scripts and installed a desktop icon at `/home/adamgoodwin/Desktop/Perpetual Context Protection.desktop`.
 - 2026-06-29T20:44:55-06:00: Changed the installed launcher and in-app brand mark to an infinity symbol, fixed Electron `file://` renderer asset loading by using a relative Vite base, and upgraded `desktop:smoke` to fail if the app shell text does not render.
+- 2026-06-29T20:44:55-06:00: Refreshed the Linux desktop launcher at `/home/adamgoodwin/Desktop/Perpetual Context Protection.desktop`.
 - 2026-06-29T20:29:52-06:00: `npm test` passed with 15 unit tests.
 - 2026-06-29T20:29:52-06:00: `npm run lint` passed.
 - 2026-06-29T20:29:52-06:00: `npm run build` passed.
@@ -456,6 +457,7 @@ Implementation evidence:
 - 2026-06-29T20:44:55-06:00: `npm run lint` passed.
 - 2026-06-29T20:44:55-06:00: `npm run build` passed.
 - 2026-06-29T20:44:55-06:00: `npm run desktop:smoke` passed under `xvfb`; the smoke hook now verifies rendered desktop shell text. Headless DBus warnings only.
+- 2026-06-29T20:44:55-06:00: `npm run test:vscode` passed under `xvfb`; extension-host managed-session proof remains healthy.
 
 Close-out state: Draft complete for Chunk Five controls. Remaining integration
 evidence is a human-observed two-session run after the Chunk Four live-cycle
@@ -607,6 +609,8 @@ sole reason to inject text.
 | 2026-06-29T20:44:55-06:00 | `npm run lint` | pass | ESLint passed for source, tests, and Vite config. |
 | 2026-06-29T20:44:55-06:00 | `npm run build` | pass | TypeScript compile and desktop renderer production build passed with relative Electron asset paths. |
 | 2026-06-29T20:44:55-06:00 | `npm run desktop:smoke` | pass | Electron rendered the desktop shell text under `xvfb`; headless DBus warnings only. |
+| 2026-06-29T20:44:55-06:00 | `npm run test:vscode` | pass | VS Code extension-host test passed under `xvfb`; headless DBus warnings only. |
+| 2026-06-29T20:44:55-06:00 | `npm run desktop:install-linux-launcher` | pass | Desktop launcher refreshed at `/home/adamgoodwin/Desktop/Perpetual Context Protection.desktop`. |
 
 ## Next Handoff
 
