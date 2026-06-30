@@ -1,7 +1,7 @@
 # Start Here
 
-Last Updated: 2026-06-29T21:36:33-06:00
-Status: Chunk Four integration complete - Chunk Five two-session evidence pending
+Last Updated: 2026-06-29T21:53:25-06:00
+Status: Chunk Five integration complete - Chunk Six packaging pending
 Owner: Adam Goodwin
 
 ## 2026-06-29 Chunk Zero Completion Handoff
@@ -20,7 +20,7 @@ Resume rule for the next implementation session:
 2. Run `git status --short`.
 3. Read this file and `docs/current-build-pathway.md`.
 4. Do not restart from the superseded tmux/n8n plan in `PLAN.md`.
-5. Continue human-observed validation with Chunk Five two-session validation.
+5. Continue with Chunk Six Windows/Linux packaging.
 
 Most important product decision:
 
@@ -113,7 +113,7 @@ and architecture plan. `PLAN.md` is retained as superseded tmux/n8n research.
 
 Current priorities:
 
-- **Continue observed validation** - launch the infinity-icon desktop app from `/home/adamgoodwin/Desktop/Perpetual Context Protection.desktop`; Chunk Four one-session dry-run/live Codex cycle is complete, so continue with the Chunk Five two-session pass
+- **Package the app for real use** - Chunk Five's watched two-session Codex pass is complete, so continue with Chunk Six Windows/Linux packaging and setup flow
 - Build VS Code-first, coder-agnostic behavior before optional tmux or n8n adapters
 - Treat terminal observability as explicit session metadata: managed, adoptable, candidate, or unsupported
 - Use multi-signal pause detection, not a single required `===CHUNK_DONE===` phrase

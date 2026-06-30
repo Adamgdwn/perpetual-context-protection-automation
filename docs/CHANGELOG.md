@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+- 2026-06-29: Completed Chunk Five watched integration evidence. Two managed
+  Codex sessions in separate workspace groups passed dry-run and live compact
+  cycles independently, candidate/unsupported cards stayed unarmable, pause
+  isolation held, `Arm All` did not unpause or re-arm ineligible cards, and the
+  disposable sessions were killed through per-card controls after evidence
+  capture.
 - 2026-06-29: Completed Chunk Four watched integration evidence. The managed
   Codex dry-run/live cycle now keeps idle armed sessions watching, submits Codex
   commands with the required separated encoded Enter sequence, waits for

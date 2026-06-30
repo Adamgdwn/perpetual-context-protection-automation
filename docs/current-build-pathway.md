@@ -1,7 +1,7 @@
 # Current Build Pathway
 
-Last Updated: 2026-06-29T21:36:33-06:00
-Status: Chunk Four integration complete - Chunk Five two-session evidence pending
+Last Updated: 2026-06-29T21:53:25-06:00
+Status: Chunk Five integration complete - Chunk Six packaging pending
 Owner: Technical Lead
 
 > **Single active pathway document.** This is the live path from planning to a
@@ -66,8 +66,8 @@ human decision.
 | Chunk Two - Desktop shell and session cards | done | 2026-06-29T19:37:10-06:00 | build agent | Electron desktop shell, bridge desktop state, session cards, logs, and guarded operator actions |
 | Chunk Three - Agent profiles and signal detector | done | 2026-06-29T20:11:30-06:00 | build agent | Claude/Codex profiles, multi-signal boundary detection |
 | Chunk Four - One managed compact cycle | done | 2026-06-29T21:36:33-06:00 | build agent | Watched managed Codex dry-run/live compact cycle passed; compact and resume evidence recorded |
-| Chunk Five - Multi-session arm/pause/all control | active | 2026-06-29T20:44:55-06:00 | build agent | Workspace grouping, per-card resume/reset/kill controls, safer arm-all, and identity-rich logs added; manual two-session evidence pending |
-| Chunk Six - Windows/Linux packaging | pending | - | build agent | Installable app + extension setup |
+| Chunk Five - Multi-session arm/pause/all control | done | 2026-06-29T21:50:34-06:00 | build agent | Watched two-session Codex dry-run/live pass completed; pause isolation, Arm All safety, and kill cleanup verified |
+| Chunk Six - Windows/Linux packaging | active | 2026-06-29T21:50:34-06:00 | build agent | Installable app + extension setup |
 | Chunk Seven - Public release hardening | pending | - | build agent | Docs, examples, security notes, GitHub release path |
 
 ## Chunk Zero - Repo And Public Project Setup
@@ -406,7 +406,7 @@ unsafe injections. Capture logs and revise detector before continuing.
 
 ## Chunk Five - Multi-Session Arm/Pause/All Control
 
-Status: active
+Status: done
 
 Completion target: Integration complete
 
@@ -437,7 +437,7 @@ Acceptance criteria:
 - [x] Logs clearly identify session id, workspace, agent, action, and result
 - [x] Session cards show complete, blocked, needs-human, paused, compacting, resuming, and error states
 - [x] No command is sent to candidate/unsupported sessions
-- [ ] Manual two-session run evidence is recorded while Adam watches
+- [x] Manual two-session run evidence is recorded while Adam watches
 
 Validation:
 
@@ -460,10 +460,14 @@ Implementation evidence:
 - 2026-06-29T20:44:55-06:00: `npm run build` passed.
 - 2026-06-29T20:44:55-06:00: `npm run desktop:smoke` passed under `xvfb`; the smoke hook now verifies rendered desktop shell text. Headless DBus warnings only.
 - 2026-06-29T20:44:55-06:00: `npm run test:vscode` passed under `xvfb`; extension-host managed-session proof remains healthy.
+- 2026-06-29T21:50:34-06:00: Manual watched two-session Codex run passed. Two workspace heartbeats produced separate workspace groups plus candidate/unsupported cards; `Arm All` armed only managed cards `09eb7e64-f02e-4273-b06f-ed7ada55ef8c` and `b4e16712-1eae-4a0b-8ddd-453728563b5d`.
+- 2026-06-29T21:50:34-06:00: Dry-run logged separate `automation-dry-run` events for both sessions at `2026-06-30T03:47:45.285Z` and `2026-06-30T03:47:51.286Z`.
+- 2026-06-29T21:50:34-06:00: Live mode sent compact to both sessions at `2026-06-30T03:48:21.308Z`, then resume to Workspace One at `2026-06-30T03:48:54.320Z` and Workspace Two at `2026-06-30T03:49:00.324Z`.
+- 2026-06-29T21:50:34-06:00: Both cards settled back to `watching` with `chunkCount=1`, no second compact fired, candidate/unsupported cards stayed idle and unarmable, pausing Workspace One left Workspace Two watching, and `Arm All` affected zero cards while none were eligible.
+- 2026-06-29T21:50:34-06:00: Disposable managed Codex sessions were killed through per-card controls after evidence capture.
 
-Close-out state: Draft complete for Chunk Five controls. Remaining integration
-evidence is a human-observed two-session run after the Chunk Four live-cycle
-manual test is safe to perform.
+Close-out state: Integration complete for Chunk Five multi-session controls.
+Remaining integration evidence belongs to Chunk Six packaging and setup.
 
 Stop condition: Stop if multiple sessions cause ambiguous ownership, mixed logs,
 or accidental cross-session command sends.
@@ -622,11 +626,20 @@ sole reason to inject text.
 | 2026-06-29T21:36:33-06:00 | `npm run test:vscode` | pass | VS Code extension-host test passed under `xvfb`; headless warnings only. |
 | 2026-06-29T21:41:07-06:00 | `git diff --check` | pass | No whitespace errors in the final diff. |
 | 2026-06-29T21:41:07-06:00 | `graphify update . --no-cluster` | pass | Repo graph refreshed without clustering; 699 nodes and 6959 edges. |
+| 2026-06-29T21:44:10-06:00 | `bash scripts/governance-preflight.sh` | pass | Chunk Five watched two-session validation passed preflight with 0 warnings. |
+| 2026-06-29T21:50:34-06:00 | `npm run build` | pass | TypeScript compile and desktop renderer production build passed before launching the watched desktop run. |
+| 2026-06-29T21:50:34-06:00 | manual watched two-session Codex dry-run/live cycle | pass | Two managed Codex cards in separate workspace groups dry-ran, compacted live, resumed independently, returned to watching with `chunkCount=1`, and were killed through card controls. |
+| 2026-06-29T21:52:38-06:00 | `npm run lint` | pass | ESLint passed for source, tests, and Vite config. |
+| 2026-06-29T21:52:38-06:00 | `npm test` | pass | 21 unit tests passed, including multi-session controls, blocked-session isolation, and compact-cycle gating. |
+| 2026-06-29T21:52:38-06:00 | `npm run build` | pass | TypeScript compile and desktop renderer production build passed. |
+| 2026-06-29T21:52:38-06:00 | `npm run desktop:smoke` | pass | Electron smoke rendered under `xvfb`; headless DBus warnings and one transient desktop-state fetch reset only, exit code 0. |
+| 2026-06-29T21:52:38-06:00 | `npm run test:vscode` | pass | VS Code extension-host test passed under `xvfb`; headless DBus/GPU/WebGL warnings only. |
+| 2026-06-29T21:53:25-06:00 | `git diff --check` | pass | No whitespace errors in the final doc diff. |
+| 2026-06-29T21:53:25-06:00 | `graphify update . --no-cluster` | pass | Repo graph refresh completed without clustering; 699 nodes and 7972 edges. |
 
 ## Next Handoff
 
-Continue with Chunk Five human-observed two-session validation. Adam can launch
-the desktop app from `/home/adamgoodwin/Desktop/Perpetual Context Protection.desktop`;
-the launcher uses the infinity icon and the renderer asset-path bug has been
-fixed. Keep dry-run first, start two managed sessions, verify session-isolated
-events and controls, then switch to live only while Adam is watching.
+Continue with Chunk Six Windows/Linux packaging. The desktop app can still be
+launched from `/home/adamgoodwin/Desktop/Perpetual Context Protection.desktop`;
+the launcher uses the infinity icon, the renderer asset-path bug has been
+fixed, and Chunk Five's watched two-session control evidence is complete.
