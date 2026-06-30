@@ -1,7 +1,7 @@
 # Current Build Pathway
 
-Last Updated: 2026-06-29T20:44:55-06:00
-Status: Chunk Five draft controls added - manual live and two-session evidence pending
+Last Updated: 2026-06-29T21:36:33-06:00
+Status: Chunk Four integration complete - Chunk Five two-session evidence pending
 Owner: Technical Lead
 
 > **Single active pathway document.** This is the live path from planning to a
@@ -65,7 +65,7 @@ human decision.
 | Chunk One - VS Code integration spike | done | 2026-06-29T19:18:45-06:00 | build agent | Bridge-owned `node-pty` path proved on Linux; Windows validation handoff recorded |
 | Chunk Two - Desktop shell and session cards | done | 2026-06-29T19:37:10-06:00 | build agent | Electron desktop shell, bridge desktop state, session cards, logs, and guarded operator actions |
 | Chunk Three - Agent profiles and signal detector | done | 2026-06-29T20:11:30-06:00 | build agent | Claude/Codex profiles, multi-signal boundary detection |
-| Chunk Four - One managed compact cycle | validation pending | 2026-06-29T20:29:52-06:00 | build agent | State machine, dry-run/live mode, desktop launcher, and automated validation complete; manual live cycle pending |
+| Chunk Four - One managed compact cycle | done | 2026-06-29T21:36:33-06:00 | build agent | Watched managed Codex dry-run/live compact cycle passed; compact and resume evidence recorded |
 | Chunk Five - Multi-session arm/pause/all control | active | 2026-06-29T20:44:55-06:00 | build agent | Workspace grouping, per-card resume/reset/kill controls, safer arm-all, and identity-rich logs added; manual two-session evidence pending |
 | Chunk Six - Windows/Linux packaging | pending | - | build agent | Installable app + extension setup |
 | Chunk Seven - Public release hardening | pending | - | build agent | Docs, examples, security notes, GitHub release path |
@@ -333,7 +333,7 @@ compact command.
 
 ## Chunk Four - One Managed Compact Cycle
 
-Status: validation pending
+Status: done
 
 Completion target: Integration complete
 
@@ -367,7 +367,7 @@ Acceptance criteria:
 - [x] Double-fire protection prevents repeated compacts for the same boundary
 - [x] If task is complete, blocked, or uncertain, no compact command is sent
 - [x] Operator can pause before or during watching
-- [ ] Manual live managed Claude/Codex cycle is captured while Adam watches
+- [x] Manual live managed Claude/Codex cycle is captured while Adam watches
 
 Validation:
 
@@ -387,15 +387,17 @@ Implementation evidence:
 - 2026-06-29T20:29:52-06:00: Added Linux launcher scripts and installed a desktop icon at `/home/adamgoodwin/Desktop/Perpetual Context Protection.desktop`.
 - 2026-06-29T20:44:55-06:00: Changed the installed launcher and in-app brand mark to an infinity symbol, fixed Electron `file://` renderer asset loading by using a relative Vite base, and upgraded `desktop:smoke` to fail if the app shell text does not render.
 - 2026-06-29T20:44:55-06:00: Refreshed the Linux desktop launcher at `/home/adamgoodwin/Desktop/Perpetual Context Protection.desktop`.
+- 2026-06-29T21:36:33-06:00: Live watched Codex cycle exposed and fixed three real integration issues before acceptance: idle armed sessions now keep watching without boundary evidence, Codex uses a separated encoded submit sequence, and resume waits for post-compact completion/prompt-ready evidence instead of only a quiet timer.
+- 2026-06-29T21:36:33-06:00: Manual watched managed Codex run passed in the rebuilt desktop app. Dry-run logged `Codex dry run: would compact at detected boundary` at `2026-06-30T03:33:51.018Z`; live mode sent `/compact` at `2026-06-30T03:34:47.042Z`; live resume sent `Carry on with the next chunk.` at `2026-06-30T03:35:30.055Z`; card returned to `watching` with `chunkCount=1`.
 - 2026-06-29T20:29:52-06:00: `npm test` passed with 15 unit tests.
 - 2026-06-29T20:29:52-06:00: `npm run lint` passed.
 - 2026-06-29T20:29:52-06:00: `npm run build` passed.
 - 2026-06-29T20:29:52-06:00: `npm run desktop:smoke` passed under `xvfb`; Electron emitted headless DBus warnings but exited successfully.
 - 2026-06-29T20:29:52-06:00: `npm run test:vscode` passed under `xvfb`; extension-host managed-session proof remains healthy.
 
-Close-out state: Draft complete for the Chunk Four implementation. The remaining
-integration evidence is a human-observed dry-run, then live Claude/Codex compact
-cycle using the desktop launcher and VS Code companion extension.
+Close-out state: Integration complete for the Chunk Four one-session managed
+Codex dry-run/live compact cycle. Remaining integration evidence belongs to
+Chunk Five multi-session validation.
 
 Stop condition: Stop after two repeated false positives, missed boundaries, or
 unsafe injections. Capture logs and revise detector before continuing.
@@ -611,14 +613,20 @@ sole reason to inject text.
 | 2026-06-29T20:44:55-06:00 | `npm run desktop:smoke` | pass | Electron rendered the desktop shell text under `xvfb`; headless DBus warnings only. |
 | 2026-06-29T20:44:55-06:00 | `npm run test:vscode` | pass | VS Code extension-host test passed under `xvfb`; headless DBus warnings only. |
 | 2026-06-29T20:44:55-06:00 | `npm run desktop:install-linux-launcher` | pass | Desktop launcher refreshed at `/home/adamgoodwin/Desktop/Perpetual Context Protection.desktop`. |
+| 2026-06-29T21:13:51-06:00 | `bash scripts/governance-preflight.sh` | pass | Live validation fix work passed preflight with 0 warnings. |
+| 2026-06-29T21:36:33-06:00 | `npm test` | pass | 21 unit tests, including Codex submit sequence, idle-watch behavior, compact-complete gating, and repeated-boundary protection. |
+| 2026-06-29T21:36:33-06:00 | manual watched Codex dry-run/live cycle | pass | Desktop event log showed dry-run would compact, live compact send, compact-complete wait, live resume send, and return to watching with `chunkCount=1`. |
+| 2026-06-29T21:36:33-06:00 | `npm run lint` | pass | ESLint passed for source, tests, and Vite config. |
+| 2026-06-29T21:36:33-06:00 | `npm run build` | pass | TypeScript compile and desktop renderer production build passed. |
+| 2026-06-29T21:36:33-06:00 | `npm run desktop:smoke` | pass | Electron smoke rendered app under `xvfb`; headless DBus warnings and one transient desktop-state fetch reset only, exit code 0. |
+| 2026-06-29T21:36:33-06:00 | `npm run test:vscode` | pass | VS Code extension-host test passed under `xvfb`; headless warnings only. |
+| 2026-06-29T21:41:07-06:00 | `git diff --check` | pass | No whitespace errors in the final diff. |
+| 2026-06-29T21:41:07-06:00 | `graphify update . --no-cluster` | pass | Repo graph refreshed without clustering; 699 nodes and 6959 edges. |
 
 ## Next Handoff
 
-Continue with human-observed integration evidence. Adam can launch the desktop
-app from `/home/adamgoodwin/Desktop/Perpetual Context Protection.desktop`; the
-launcher now uses the infinity icon and the renderer asset-path bug has been
-fixed. Use dry-run mode first, start or attach one managed Claude/Codex session
-through the VS Code companion extension, verify the event log records detector
-evidence and "would compact", then switch to live mode only when Adam is
-watching and ready to pause if needed. After the one-session live cycle is
-verified, run a two-session observed pass for Chunk Five.
+Continue with Chunk Five human-observed two-session validation. Adam can launch
+the desktop app from `/home/adamgoodwin/Desktop/Perpetual Context Protection.desktop`;
+the launcher uses the infinity icon and the renderer asset-path bug has been
+fixed. Keep dry-run first, start two managed sessions, verify session-isolated
+events and controls, then switch to live only while Adam is watching.

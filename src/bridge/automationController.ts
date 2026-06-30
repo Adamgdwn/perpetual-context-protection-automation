@@ -6,7 +6,7 @@ import type {
   SessionAutomationMode,
   SessionAutomationState
 } from "../shared/protocol";
-import type { ResolvedAgentProfile } from "../shared/profiles";
+import type { AgentSignalPattern, ResolvedAgentProfile } from "../shared/profiles";
 import {
   detectSessionSignal,
   type SignalDetectorDecision
@@ -237,6 +237,13 @@ export class AutomationController {
       return;
     }
 
+    const output = session.getOutput();
+    const outputAfterCompactSend = output.slice(record.compactPhase.outputLengthAtSend);
+    if (!hasCompactCompleteEvidence(session.profile, outputAfterCompactSend)) {
+      return;
+    }
+    const outputLength = output.length;
+
     const lastOutputAtMs = coerceTime(session.lastOutputAt);
     const quietForMs =
       lastOutputAtMs === undefined
@@ -262,7 +269,7 @@ export class AutomationController {
       details: [
         `resume:${session.profile.resumeInstruction}`,
         `quietForMs:${quietForMs}`,
-        `outputLength:${session.getOutput().length}`
+        `outputLength:${outputLength}`
       ]
     }));
   }
@@ -424,13 +431,53 @@ function createBoundaryKey(
   session: AutomatableSession,
   decision: SignalDetectorDecision
 ): string {
-  const evidenceKey = decision.evidence
+  const output = session.getOutput();
+  const boundaryEvidence = decision.evidence.filter(isBoundaryEvidence);
+  const evidenceKey = boundaryEvidence
     .map((item) => `${item.kind}:${item.id}:${item.excerpt ?? ""}`)
     .join("|");
+  const boundaryPosition = Math.max(
+    0,
+    ...boundaryEvidence.map((item) =>
+      item.excerpt ? output.lastIndexOf(item.excerpt) : -1
+    )
+  );
   return createHash("sha256")
-    .update(`${session.id}:${session.getOutput().length}:${evidenceKey}`)
+    .update(`${session.id}:${boundaryPosition}:${evidenceKey}`)
     .digest("hex")
     .slice(0, 16);
+}
+
+function isBoundaryEvidence(
+  evidence: SignalDetectorDecision["evidence"][number]
+): boolean {
+  return (
+    evidence.kind === "explicit-marker" ||
+    evidence.id === "next-chunk-ready" ||
+    evidence.id === "next-action-start-chunk" ||
+    evidence.id === "chunk-complete"
+  );
+}
+
+function hasCompactCompleteEvidence(
+  profile: ResolvedAgentProfile,
+  output: string
+): boolean {
+  if (profile.signals.compactComplete.some((signal: AgentSignalPattern) =>
+    signal.pattern.test(output)
+  )) {
+    return true;
+  }
+
+  if (profile.id !== "codex") {
+    return false;
+  }
+
+  const recentOutput = output.slice(-2_000);
+  return (
+    /›[^\r\n]*(?:gpt-\d|gpt-5|context\s+left)/iu.test(recentOutput) &&
+    !/\bWorking\s*\(/iu.test(recentOutput)
+  );
 }
 
 function coerceTime(value: Date | number | string | undefined): number | undefined {

@@ -12,6 +12,11 @@ void test("built-in coder profiles define launch, compact, resume, signals, and 
     assert.equal(profile.command, profile.launchCommand.command);
     assert.deepEqual(profile.args, profile.launchCommand.args);
     assert.equal(profile.compactCommand, "/compact");
+    assert.equal(
+      profile.inputSubmitSequence,
+      profileId === "codex" ? "\u001b[13u" : "\r"
+    );
+    assert.equal(profile.inputSubmitDelayMs, profileId === "codex" ? 25 : 0);
     assert.match(profile.resumeInstruction, /next chunk/u);
     assert.ok(profile.signals.explicitBoundaryMarkers.includes("===CHUNK_DONE==="));
     assert.ok(profile.signals.explicitCompleteMarkers.includes("===TASK_COMPLETE==="));
@@ -21,6 +26,7 @@ void test("built-in coder profiles define launch, compact, resume, signals, and 
     assert.ok(profile.signals.complete.length > 0);
     assert.ok(profile.signals.blocked.length > 0);
     assert.ok(profile.signals.needsHuman.length > 0);
+    assert.ok(profile.signals.compactComplete.length > 0);
     assert.ok(profile.idleRules.quietPeriodMs > 0);
     assert.ok(profile.idleRules.recentlySentCommandMs > 0);
   }
@@ -53,16 +59,31 @@ void test("detector accepts natural chunk-boundary language only with idle evide
   assert.equal(idleDecision.state, "chunk-boundary");
   assert.equal(idleDecision.shouldCompact, true);
 
-  const activeDecision = detectSessionSignal({
+  const settlingDecision = detectSessionSignal({
     profile: "claude",
     output: signalSamples.naturalChunkBoundary,
     now: signalSampleTimes.now,
     lastOutputAt: signalSampleTimes.active
   });
 
-  assert.equal(activeDecision.state, "uncertain");
-  assert.equal(activeDecision.shouldCompact, false);
-  assert.equal(activeDecision.stopAutomation, true);
+  assert.equal(settlingDecision.state, "active");
+  assert.equal(settlingDecision.shouldCompact, false);
+  assert.equal(settlingDecision.stopAutomation, false);
+});
+
+void test("detector waits when boundary language follows recent input", () => {
+  const decision = detectSessionSignal({
+    profile: "codex",
+    output: signalSamples.explicitChunkDone,
+    now: signalSampleTimes.now,
+    lastOutputAt: signalSampleTimes.active,
+    recentlySentCommandAt: signalSampleTimes.recentCommand
+  });
+
+  assert.equal(decision.state, "active");
+  assert.equal(decision.shouldCompact, false);
+  assert.equal(decision.stopAutomation, false);
+  assert.ok(decision.evidence.some((item) => item.kind === "recent-command"));
 });
 
 void test("detector identifies active streaming without compacting", () => {
@@ -76,6 +97,20 @@ void test("detector identifies active streaming without compacting", () => {
   assert.equal(decision.state, "active");
   assert.equal(decision.shouldCompact, false);
   assert.equal(decision.stopAutomation, false);
+});
+
+void test("detector keeps idle sessions without signals watching", () => {
+  const decision = detectSessionSignal({
+    profile: "codex",
+    output: "Codex is waiting at an empty prompt.",
+    now: signalSampleTimes.now,
+    lastOutputAt: signalSampleTimes.idle
+  });
+
+  assert.equal(decision.state, "active");
+  assert.equal(decision.shouldCompact, false);
+  assert.equal(decision.stopAutomation, false);
+  assert.ok(decision.evidence.some((item) => item.id === "quiet-period"));
 });
 
 void test("detector returns uncertain when boundary and active evidence conflict", () => {
@@ -156,7 +191,7 @@ void test("echo-proof profile keeps proof readiness separate from coder completi
     output: signalSamples.echoProofReady
   });
 
-  assert.equal(decision.state, "uncertain");
+  assert.equal(decision.state, "active");
   assert.equal(decision.shouldCompact, false);
-  assert.equal(decision.stopAutomation, true);
+  assert.equal(decision.stopAutomation, false);
 });

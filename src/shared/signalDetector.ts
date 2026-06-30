@@ -142,6 +142,19 @@ export function detectSessionSignal(
       );
     }
 
+    const hasOnlyRecentCommand =
+      activeReasons.length === 1 && activeReasons[0]?.kind === "recent-command";
+    if (activeReasons.length === 0 || hasOnlyRecentCommand) {
+      return decision(
+        "active",
+        false,
+        false,
+        "Boundary language appeared before safe idle agreement; waiting.",
+        [...boundaryReasons, ...idleReasons, ...activeReasons],
+        quietForMs
+      );
+    }
+
     return decision(
       "uncertain",
       false,
@@ -164,10 +177,10 @@ export function detectSessionSignal(
   }
 
   return decision(
-    "uncertain",
+    "active",
     false,
-    true,
-    "Idle terminal has no clear boundary or stop signal.",
+    false,
+    "Idle terminal has no boundary or stop signal yet.",
     idleReasons,
     quietForMs
   );

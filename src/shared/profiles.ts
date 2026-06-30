@@ -21,6 +21,7 @@ export interface AgentProfileSignals {
   blocked: AgentSignalPattern[];
   needsHuman: AgentSignalPattern[];
   compacting: AgentSignalPattern[];
+  compactComplete: AgentSignalPattern[];
   active: AgentSignalPattern[];
   inputReady: AgentSignalPattern[];
   conflictGuards: AgentSignalPattern[];
@@ -49,7 +50,8 @@ export interface ResolvedAgentProfile {
   args: string[];
   compactCommand: string;
   resumeInstruction: string;
-  inputLineEnding: "\r" | "\n";
+  inputSubmitSequence: string;
+  inputSubmitDelayMs: number;
   signals: AgentProfileSignals;
   idleRules: AgentIdleRules;
   promptHints: AgentPromptHints;
@@ -72,7 +74,8 @@ export function resolveAgentProfile(
       launchCommand: { command: "claude", args: [] },
       compactCommand: "/compact",
       resumeInstruction: "Carry on with the next chunk.",
-      inputLineEnding: "\r",
+      inputSubmitSequence: "\r",
+      inputSubmitDelayMs: 0,
       signals: createCoderSignals("claude"),
       idleRules: createCoderIdleRules(),
       promptHints: createCoderPromptHints()
@@ -86,7 +89,8 @@ export function resolveAgentProfile(
       launchCommand: { command: "codex", args: [] },
       compactCommand: "/compact",
       resumeInstruction: "Carry on with the next chunk.",
-      inputLineEnding: "\r",
+      inputSubmitSequence: "\u001b[13u",
+      inputSubmitDelayMs: 25,
       signals: createCoderSignals("codex"),
       idleRules: createCoderIdleRules(),
       promptHints: createCoderPromptHints()
@@ -107,7 +111,8 @@ export function resolveAgentProfile(
       },
       compactCommand: "/compact",
       resumeInstruction: "Carry on with the next chunk.",
-      inputLineEnding: "\r",
+      inputSubmitSequence: "\r",
+      inputSubmitDelayMs: 0,
       signals: createEchoProofSignals(),
       idleRules: createCoderIdleRules(),
       promptHints: createEchoProofPromptHints()
@@ -126,7 +131,8 @@ export function resolveAgentProfile(
     },
     compactCommand: "/compact",
     resumeInstruction: "Carry on with the next chunk.",
-    inputLineEnding: "\r",
+    inputSubmitSequence: "\r",
+    inputSubmitDelayMs: 0,
     signals: createEchoProofSignals(),
     idleRules: createCoderIdleRules(),
     promptHints: createEchoProofPromptHints()
@@ -215,6 +221,13 @@ function createCoderSignals(profileId: "claude" | "codex"): AgentProfileSignals 
         /\b(?:compacting|compact(?:ion)?\s+in\s+progress|summarizing\s+context)\b/iu
       )
     ],
+    compactComplete: [
+      signal(
+        "context-compacted",
+        `${displayName} reports that context compaction completed`,
+        /\b(?:context\s+compacted|compaction\s+complete|compact\s+complete|compacted\s+context)\b/iu
+      )
+    ],
     active: [
       signal(
         "running-command",
@@ -260,6 +273,7 @@ function createEchoProofSignals(): AgentProfileSignals {
     blocked: [],
     needsHuman: [],
     compacting: [],
+    compactComplete: [],
     active: [],
     inputReady: [
       signal(

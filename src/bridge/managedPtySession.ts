@@ -83,7 +83,18 @@ export class ManagedPtySession {
   }
 
   public sendLine(text: string): void {
-    this.write(`${text}${this.profile.inputLineEnding}`);
+    this.write(text);
+    if (this.profile.inputSubmitDelayMs <= 0) {
+      this.write(this.profile.inputSubmitSequence);
+      return;
+    }
+
+    const timer = setTimeout(() => {
+      if (this.status !== "exited") {
+        this.write(this.profile.inputSubmitSequence);
+      }
+    }, this.profile.inputSubmitDelayMs);
+    timer.unref();
   }
 
   public getOutput(): string {

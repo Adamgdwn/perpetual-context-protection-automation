@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+- 2026-06-29: Completed Chunk Four watched integration evidence. The managed
+  Codex dry-run/live cycle now keeps idle armed sessions watching, submits Codex
+  commands with the required separated encoded Enter sequence, waits for
+  post-compact completion or prompt-ready evidence before resume, and prevents
+  repeated compacts for the same boundary after command output changes.
 - 2026-06-29: Added Chunk Five draft multi-session controls. Workspace-grouped
   session cards now expose arm/resume/pause/reset/kill/dismiss controls,
   `Arm All` only arms idle bridge-managed sessions, candidate/unsupported

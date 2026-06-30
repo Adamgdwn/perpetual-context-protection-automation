@@ -46,7 +46,7 @@ void test("live mode sends compact after boundary and waits for quiet before res
   );
   assert.equal(controller.getSnapshot(managedCardId(session.id)).state, "compacting");
 
-  session.output += "\nCompacting context...";
+  session.output += "\nContext compacted.";
   session.lastOutputAt = new Date(signalSampleTimes.now).toISOString();
   const tooSoon = controller.evaluateSessions([session], signalSampleTimes.now + 10_000);
   assert.deepEqual(tooSoon, []);
@@ -69,6 +69,56 @@ void test("live mode sends compact after boundary and waits for quiet before res
 
   controller.evaluateSessions([session], signalSampleTimes.now + 47_000);
   assert.equal(controller.getSnapshot(managedCardId(session.id)).state, "watching");
+
+  controller.evaluateSessions([session], signalSampleTimes.now + 63_000);
+  assert.deepEqual(session.sentLines, [
+    session.profile.compactCommand,
+    session.profile.resumeInstruction
+  ]);
+  assert.equal(controller.getSnapshot(managedCardId(session.id)).state, "watching");
+});
+
+void test("live mode waits for compact output before sending resume", () => {
+  const controller = new AutomationController();
+  const session = new FakeSession(signalSamples.explicitChunkDone);
+  controller.setMode("live");
+  controller.armCard(managedCardId(session.id));
+
+  controller.evaluateSessions([session], signalSampleTimes.now);
+  assert.deepEqual(session.sentLines, [session.profile.compactCommand]);
+
+  controller.evaluateSessions([session], signalSampleTimes.now + 31_000);
+  assert.deepEqual(session.sentLines, [session.profile.compactCommand]);
+  assert.equal(controller.getSnapshot(managedCardId(session.id)).state, "compacting");
+
+  session.output += "\nContext compacted.";
+  session.lastOutputAt = new Date(signalSampleTimes.now + 31_000).toISOString();
+  controller.evaluateSessions([session], signalSampleTimes.now + 62_000);
+
+  assert.deepEqual(session.sentLines, [
+    session.profile.compactCommand,
+    session.profile.resumeInstruction
+  ]);
+  assert.equal(controller.getSnapshot(managedCardId(session.id)).state, "resuming");
+});
+
+void test("live mode accepts Codex prompt-ready output as compact complete", () => {
+  const controller = new AutomationController();
+  const session = new FakeSession(signalSamples.explicitChunkDone);
+  controller.setMode("live");
+  controller.armCard(managedCardId(session.id));
+
+  controller.evaluateSessions([session], signalSampleTimes.now);
+  assert.deepEqual(session.sentLines, [session.profile.compactCommand]);
+
+  session.output += "\n› Explain this codebase gpt-5.5 xhigh";
+  session.lastOutputAt = new Date(signalSampleTimes.now + 31_000).toISOString();
+  controller.evaluateSessions([session], signalSampleTimes.now + 62_000);
+
+  assert.deepEqual(session.sentLines, [
+    session.profile.compactCommand,
+    session.profile.resumeInstruction
+  ]);
 });
 
 void test("terminal stop states do not send compact commands", () => {
@@ -139,7 +189,9 @@ void test("pause suppresses watching and compact-resume sends", () => {
   assert.deepEqual(session.sentLines, [session.profile.compactCommand]);
 
   controller.armCard(managedCardId(session.id));
-  controller.evaluateSessions([session], signalSampleTimes.now + 31_000);
+  session.output += "\nContext compacted.";
+  session.lastOutputAt = new Date(signalSampleTimes.now + 31_000).toISOString();
+  controller.evaluateSessions([session], signalSampleTimes.now + 62_000);
   assert.deepEqual(session.sentLines, [
     session.profile.compactCommand,
     session.profile.resumeInstruction
