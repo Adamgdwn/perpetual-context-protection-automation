@@ -3,6 +3,7 @@ import {
   type BridgeSessionSummary,
   type DesktopActionResponse,
   type DesktopEventLogEntry,
+  type DesktopSetupSummary,
   type DesktopSessionCard,
   type DesktopStateResponse,
   type ExtensionHeartbeat,
@@ -42,6 +43,10 @@ export class DesktopStateStore {
   private readonly dismissedCardIds = new Set<string>();
   private readonly eventLog: DesktopEventLogEntry[] = [];
   private eventSequence = 0;
+
+  public constructor(
+    private readonly createSetupSummary = createDefaultSetupSummary
+  ) {}
 
   public recordHeartbeat(heartbeat: ExtensionHeartbeat): void {
     this.appendEvent({
@@ -92,7 +97,10 @@ export class DesktopStateStore {
     return this.actionResponse([], input);
   }
 
-  public createState(input: CardBuildInput): DesktopStateResponse {
+  public createState(
+    input: CardBuildInput,
+    setup: DesktopSetupSummary = this.createSetupSummary()
+  ): DesktopStateResponse {
     const cards = this.createCards(input);
     const lastHeartbeatAt = latestTimestamp(input.heartbeats.map((heartbeat) => heartbeat.timestamp));
 
@@ -108,6 +116,7 @@ export class DesktopStateStore {
         sessionCount: input.sessions.length,
         lastHeartbeatAt
       },
+      setup,
       cards,
       events: [...this.eventLog],
       profiles: BUILT_IN_AGENT_PROFILE_IDS.map((profileId) => {
@@ -474,6 +483,19 @@ export class DesktopStateStore {
   private recordAutomationEvent(event: AutomationRuntimeEvent): void {
     this.appendEvent(event);
   }
+}
+
+function createDefaultSetupSummary(): DesktopSetupSummary {
+  return {
+    vscodeExtension: {
+      extensionId: "adamgoodwin.perpetual-context-protection-automation",
+      expectedVersion: "0.0.1",
+      installed: false,
+      checkedLocations: [],
+      installCommand: "npm run vscode:install",
+      reloadHint: "Reload open VS Code windows after installing the companion extension."
+    }
+  };
 }
 
 function displayNameForProfile(profileId: BridgeSessionSummary["profileId"]): string {

@@ -1,7 +1,7 @@
 # Start Here
 
-Last Updated: 2026-06-29T21:53:25-06:00
-Status: Chunk Five integration complete - Chunk Six packaging pending
+Last Updated: 2026-06-29T22:05:13-06:00
+Status: Chunk Six Linux companion setup proof complete - Windows packaging pending
 Owner: Adam Goodwin
 
 ## 2026-06-29 Chunk Zero Completion Handoff
@@ -113,7 +113,7 @@ and architecture plan. `PLAN.md` is retained as superseded tmux/n8n research.
 
 Current priorities:
 
-- **Package the app for real use** - Chunk Five's watched two-session Codex pass is complete, so continue with Chunk Six Windows/Linux packaging and setup flow
+- **Package the app for real use** - Linux VS Code companion packaging/install proof passed; continue with Windows packaging, desktop app package format, and fresh-platform smoke evidence
 - Build VS Code-first, coder-agnostic behavior before optional tmux or n8n adapters
 - Treat terminal observability as explicit session metadata: managed, adoptable, candidate, or unsupported
 - Use multi-signal pause detection, not a single required `===CHUNK_DONE===` phrase

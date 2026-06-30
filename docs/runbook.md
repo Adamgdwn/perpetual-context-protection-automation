@@ -1,6 +1,6 @@
 # Runbook
 
-Last updated: 2026-06-29T20:44:55-06:00
+Last updated: 2026-06-29T22:05:13-06:00
 
 ## Purpose
 
@@ -12,6 +12,8 @@ cycles only when detector and idle evidence agree.
 
 - Bridge disconnected: confirm VS Code is open and the companion extension is
   running.
+- No VS Code windows detected: install the companion with
+  `npm run vscode:install`, then reload open VS Code windows if needed.
 - No sessions detected: launch or relaunch a managed Claude/Codex session through
   the extension.
 - Candidate session only: do not arm unattended; relaunch as managed.
@@ -33,6 +35,9 @@ cycles only when detector and idle evidence agree.
 
 - Use `/home/adamgoodwin/Desktop/Perpetual Context Protection.desktop` on this Linux workstation.
 - If the icon needs to be refreshed, run `npm run desktop:install-linux-launcher`.
+- If VS Code windows do not appear, run `npm run vscode:install`. The bridge
+  should receive heartbeats from each open VS Code window after the companion
+  extension activates.
 - The launcher should show the infinity icon and render the full desktop UI. If
   it opens blank, run `npm run desktop:smoke` before live testing.
 - Keep automation mode on `Dry Run` for the first observed cycle. Switch to

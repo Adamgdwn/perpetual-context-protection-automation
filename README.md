@@ -1,6 +1,6 @@
 # Perpetual Context Protection Automation
 
-Last updated: 2026-06-29T20:44:55-06:00
+Last updated: 2026-06-29T22:05:13-06:00
 
 ## Purpose
 
@@ -23,7 +23,7 @@ complete or blocked.
 - Technical lead: hybrid session (Claude Code + Codex)
 - Governance level: 1
 - Risk tier: low
-- Production status: Chunk Five draft controls added - manual live and two-session evidence pending
+- Production status: Chunk Six Linux companion setup proof complete - Windows packaging pending
 - Planned public repo name: `perpetual-context-protection-automation`
 
 ## Quick Start
@@ -39,6 +39,7 @@ npm test
 npm run build
 npm run desktop:smoke
 npm run test:vscode
+npm run vscode:package
 ```
 
 Use `docs/current-build-pathway.md` as the active implementation route. The
@@ -63,6 +64,12 @@ Install or refresh the Linux desktop launcher with:
 
 ```bash
 npm run desktop:install-linux-launcher
+```
+
+Install or refresh the VS Code companion extension with:
+
+```bash
+npm run vscode:install
 ```
 
 On this workstation the launcher is installed at:

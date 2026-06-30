@@ -177,6 +177,7 @@ export function App(): ReactElement {
                 void runAction(cardId, () => desktopApi.dismissCard(cardId))
               }
               onArmAll={() => void runAction(undefined, () => desktopApi.armAll())}
+              state={state}
             />
           ) : (
             <SettingsPane state={state} />
@@ -208,6 +209,7 @@ function SessionsPane(props: {
   onKill: (cardId: string) => void;
   onDismiss: (cardId: string) => void;
   onArmAll: () => void;
+  state: DesktopStateResponse | undefined;
 }): ReactElement {
   const armableCount = props.cards.filter((card) => card.canArmAll).length;
   const groups = useMemo(() => groupCardsByWorkspace(props.cards), [props.cards]);
@@ -231,10 +233,7 @@ function SessionsPane(props: {
       </div>
 
       {props.cards.length === 0 ? (
-        <div className="empty-state">
-          <Radio size={24} />
-          <span>No VS Code heartbeats yet</span>
-        </div>
+        <EmptySessions state={props.state} />
       ) : (
         <div className="workspace-card-groups">
           {groups.map((group) => (
@@ -264,6 +263,33 @@ function SessionsPane(props: {
           ))}
         </div>
       )}
+    </div>
+  );
+}
+
+function EmptySessions(props: {
+  state: DesktopStateResponse | undefined;
+}): ReactElement {
+  const extension = props.state?.setup?.vscodeExtension;
+  const bridgeOnline = props.state?.connection.bridgeOnline ?? false;
+  const title = !bridgeOnline
+    ? "Bridge offline"
+    : extension?.installed
+      ? "Waiting for VS Code windows"
+      : "VS Code companion not installed";
+  const body = !bridgeOnline
+    ? "Restart the desktop app so the local bridge can accept heartbeats."
+    : extension?.installed
+      ? extension.reloadHint
+      : `Run ${extension?.installCommand ?? "npm run vscode:install"}, then reload VS Code.`;
+
+  return (
+    <div className="empty-state">
+      <Radio size={24} />
+      <div>
+        <strong>{title}</strong>
+        <span>{body}</span>
+      </div>
     </div>
   );
 }
@@ -436,6 +462,16 @@ function SettingsPane(props: {
               ? formatTime(props.state.connection.lastHeartbeatAt)
               : "none"
           }
+        />
+        <Fact
+          label="VS Code companion"
+          value={
+            props.state?.setup?.vscodeExtension.installed ? "installed" : "missing"
+          }
+        />
+        <Fact
+          label="Install command"
+          value={props.state?.setup?.vscodeExtension.installCommand ?? "npm run vscode:install"}
         />
       </div>
     </div>

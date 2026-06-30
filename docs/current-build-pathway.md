@@ -1,7 +1,7 @@
 # Current Build Pathway
 
-Last Updated: 2026-06-29T21:53:25-06:00
-Status: Chunk Five integration complete - Chunk Six packaging pending
+Last Updated: 2026-06-29T22:05:13-06:00
+Status: Chunk Six Linux companion setup proof complete - Windows packaging pending
 Owner: Technical Lead
 
 > **Single active pathway document.** This is the live path from planning to a
@@ -67,7 +67,7 @@ human decision.
 | Chunk Three - Agent profiles and signal detector | done | 2026-06-29T20:11:30-06:00 | build agent | Claude/Codex profiles, multi-signal boundary detection |
 | Chunk Four - One managed compact cycle | done | 2026-06-29T21:36:33-06:00 | build agent | Watched managed Codex dry-run/live compact cycle passed; compact and resume evidence recorded |
 | Chunk Five - Multi-session arm/pause/all control | done | 2026-06-29T21:50:34-06:00 | build agent | Watched two-session Codex dry-run/live pass completed; pause isolation, Arm All safety, and kill cleanup verified |
-| Chunk Six - Windows/Linux packaging | active | 2026-06-29T21:50:34-06:00 | build agent | Installable app + extension setup |
+| Chunk Six - Windows/Linux packaging | active | 2026-06-29T22:05:13-06:00 | build agent | Linux VS Code companion install proof passed; Windows packaging remains |
 | Chunk Seven - Public release hardening | pending | - | build agent | Docs, examples, security notes, GitHub release path |
 
 ## Chunk Zero - Repo And Public Project Setup
@@ -476,7 +476,7 @@ or accidental cross-session command sends.
 
 ## Chunk Six - Windows/Linux Packaging
 
-Status: planned
+Status: active
 
 Completion target: Release ready
 
@@ -505,7 +505,7 @@ Acceptance criteria:
 
 - [ ] Fresh Linux install can launch desktop app and connect to VS Code extension
 - [ ] Fresh Windows install can launch desktop app and connect to VS Code extension
-- [ ] App can locate or guide installation of the VS Code extension
+- [x] App can locate or guide installation of the VS Code extension
 - [ ] App handles no VS Code windows, no extension, no sessions, and bridge disconnected states
 - [ ] Release artifacts do not include secrets
 - [ ] Rollback/uninstall path is documented
@@ -521,6 +521,18 @@ npm run build
 
 Stop condition: Stop if packaging requires a stack decision or code-signing
 decision Adam has not made.
+
+Implementation evidence:
+
+- 2026-06-29T22:05:13-06:00: Added repeatable VS Code companion packaging and install commands: `npm run vscode:package` and `npm run vscode:install`.
+- 2026-06-29T22:05:13-06:00: Packaged `dist/vscode/perpetual-context-protection-automation-0.0.1.vsix`; the VSIX contains only package metadata, README, compiled extension code, and compiled shared protocol/profile code.
+- 2026-06-29T22:05:13-06:00: Installed the companion extension into Adam's normal VS Code profile. The live bridge changed from zero heartbeats to four detected VS Code windows, including `perpetual-context-protection-automation`, `agentic-multi-agent-agent-builder`, `the-freedom-engine-os`, and one untitled VS Code window.
+- 2026-06-29T22:05:13-06:00: Added bridge-side setup detection for the local VS Code companion extension and a desktop empty state that distinguishes missing companion extension, waiting VS Code windows, and bridge offline states.
+- 2026-06-29T22:05:13-06:00: Refreshed the Linux launcher install path so the infinity icon is installed into the user icon theme as `perpetual-context-protection`.
+
+Close-out state: Task complete for the Linux companion install/setup slice.
+Chunk Six remains active for Windows packaging, desktop app packaging format,
+fresh-platform smoke evidence, and final uninstall documentation.
 
 ---
 
@@ -636,10 +648,27 @@ sole reason to inject text.
 | 2026-06-29T21:52:38-06:00 | `npm run test:vscode` | pass | VS Code extension-host test passed under `xvfb`; headless DBus/GPU/WebGL warnings only. |
 | 2026-06-29T21:53:25-06:00 | `git diff --check` | pass | No whitespace errors in the final doc diff. |
 | 2026-06-29T21:53:25-06:00 | `graphify update . --no-cluster` | pass | Repo graph refresh completed without clustering; 699 nodes and 7972 edges. |
+| 2026-06-29T21:57:46-06:00 | `bash scripts/governance-preflight.sh` | pass | Chunk Six Linux companion setup work passed preflight with 0 warnings. |
+| 2026-06-29T22:05:13-06:00 | `npm run desktop:install-linux-launcher` | pass | Linux launcher refreshed with named infinity icon at the desktop and application-menu paths. |
+| 2026-06-29T22:05:13-06:00 | `npm run vscode:install` | pass | VS Code companion VSIX packaged and installed into Adam's normal VS Code profile. |
+| 2026-06-29T22:05:13-06:00 | live bridge check | pass | Bridge reported four VS Code heartbeats and four candidate/workspace cards after companion install. |
+| 2026-06-29T22:05:13-06:00 | `npm run lint` | pass | ESLint passed for source, tests, and Vite config. |
+| 2026-06-29T22:05:13-06:00 | `node --check scripts/package-vscode-extension.mjs && node --check scripts/install-vscode-extension.mjs` | pass | VS Code package/install scripts parse successfully. |
+| 2026-06-29T22:05:13-06:00 | `npm test` | pass | 21 unit tests passed, including desktop setup guidance in the bridge state contract. |
+| 2026-06-29T22:05:13-06:00 | `npm run build` | pass | TypeScript compile and desktop renderer production build passed. |
+| 2026-06-29T22:05:13-06:00 | `npm run desktop:smoke` | pass | Electron smoke rendered under `xvfb` against the already-running bridge; headless DBus warnings only. |
+| 2026-06-29T22:05:13-06:00 | `npm run test:vscode` | pass | VS Code extension-host test passed under `xvfb`; headless DBus/GPU/WebGL warnings only. |
+| 2026-06-29T22:05:13-06:00 | `npm run vscode:package` | pass | Final VSIX contains 10 files, 13.54 KB, with no Graphify cache, desktop build output, or node modules. |
+| 2026-06-29T22:07:04-06:00 | `git diff --check` | pass | No whitespace errors in the final diff. |
+| 2026-06-29T22:07:04-06:00 | `graphify update . --no-cluster` | pass | Repo graph refresh completed without clustering; 726 nodes and 9029 edges. |
 
 ## Next Handoff
 
-Continue with Chunk Six Windows/Linux packaging. The desktop app can still be
-launched from `/home/adamgoodwin/Desktop/Perpetual Context Protection.desktop`;
-the launcher uses the infinity icon, the renderer asset-path bug has been
-fixed, and Chunk Five's watched two-session control evidence is complete.
+Continue with the remaining Chunk Six packaging work: Windows install/smoke,
+desktop app package format, fresh-platform evidence, and final uninstall notes.
+The VS Code companion extension is installed in Adam's normal VS Code profile,
+and the live bridge detected four VS Code windows after install. Existing
+unmanaged terminals are correctly shown as candidate cards and remain unarmable.
+The desktop launcher was refreshed at
+`/home/adamgoodwin/Desktop/Perpetual Context Protection.desktop` with the named
+infinity icon.

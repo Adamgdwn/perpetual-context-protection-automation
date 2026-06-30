@@ -15,6 +15,7 @@ import {
 import { DesktopStateStore } from "./desktopState";
 import { managedSessionIdFromCardId } from "./cardIds";
 import { ManagedPtySession } from "./managedPtySession";
+import { createDesktopSetupSummary } from "./vscodeSetup";
 
 export interface BridgeServerOptions {
   host?: string;
@@ -47,7 +48,7 @@ export async function startBridgeServer(
   const state: BridgeState = {
     heartbeats: new Map(),
     sessions: new Map(),
-    desktop: new DesktopStateStore(),
+    desktop: new DesktopStateStore(createDesktopSetupSummary),
     automationTimer: undefined
   };
 

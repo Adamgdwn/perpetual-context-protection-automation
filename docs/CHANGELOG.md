@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+- 2026-06-29: Added Chunk Six Linux companion setup proof. The VS Code
+  companion can now be packaged and installed with `npm run vscode:package` and
+  `npm run vscode:install`; the desktop state reports companion setup status,
+  the empty session state distinguishes missing extension versus waiting
+  windows, the Linux launcher installs the named infinity icon, and Adam's live
+  bridge detected open VS Code windows after extension install.
 - 2026-06-29: Completed Chunk Five watched integration evidence. Two managed
   Codex sessions in separate workspace groups passed dry-run and live compact
   cycles independently, candidate/unsupported cards stayed unarmable, pause

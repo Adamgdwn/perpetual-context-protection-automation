@@ -124,6 +124,18 @@ export interface DesktopConnectionSummary {
   lastHeartbeatAt?: string;
 }
 
+export interface DesktopSetupSummary {
+  vscodeExtension: {
+    extensionId: string;
+    expectedVersion: string;
+    installed: boolean;
+    installedLocation?: string;
+    checkedLocations: string[];
+    installCommand: string;
+    reloadHint: string;
+  };
+}
+
 export interface DesktopSessionCard {
   id: string;
   source: "managed-session" | "heartbeat-terminal" | "workspace";
@@ -183,6 +195,7 @@ export interface DesktopStateResponse {
     mode: SessionAutomationMode;
   };
   connection: DesktopConnectionSummary;
+  setup: DesktopSetupSummary;
   cards: DesktopSessionCard[];
   events: DesktopEventLogEntry[];
   profiles: Array<{

@@ -6,6 +6,10 @@
   "private": true,
   "publisher": "adamgoodwin",
   "license": "UNLICENSED",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Adamgdwn/perpetual-context-protection-automation.git"
+  },
   "engines": {
     "vscode": "^1.125.0",
     "node": ">=24.14.0"
@@ -71,7 +75,9 @@
     "build": "npm run compile && vite build --config vite.desktop.config.mts",
     "desktop:launch": "npm run build && electron dist/src/desktop/main.js",
     "desktop:smoke": "npm run build && xvfb-run -a electron dist/src/desktop/main.js --smoke",
-    "desktop:install-linux-launcher": "bash scripts/install-linux-desktop-launcher.sh"
+    "desktop:install-linux-launcher": "bash scripts/install-linux-desktop-launcher.sh",
+    "vscode:package": "node scripts/package-vscode-extension.mjs",
+    "vscode:install": "node scripts/install-vscode-extension.mjs"
   },
   "dependencies": {
     "lucide-react": "^1.22.0",
@@ -87,6 +93,7 @@
     "@types/vscode": "^1.125.0",
     "@vitejs/plugin-react": "^6.0.3",
     "@vscode/test-electron": "^3.0.0",
+    "@vscode/vsce": "^3.9.2",
     "electron": "^42.5.1",
     "eslint": "^10.6.0",
     "globals": "^17.7.0",

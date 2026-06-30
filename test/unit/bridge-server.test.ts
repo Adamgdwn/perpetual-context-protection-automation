@@ -101,6 +101,12 @@ void test("desktop state exposes cards, logs, and guarded operator actions", asy
     assert.equal(candidateCard.canArm, false);
     assert.equal(candidateCard.observability, "candidate");
     assert.equal(initialState.automation.mode, "dry-run");
+    assert.equal(
+      initialState.setup.vscodeExtension.extensionId,
+      "adamgoodwin.perpetual-context-protection-automation"
+    );
+    assert.equal(initialState.setup.vscodeExtension.installCommand, "npm run vscode:install");
+    assert.ok(initialState.setup.vscodeExtension.checkedLocations.length >= 1);
 
     const liveMode = await postJson<DesktopActionResponse>(
       `${runtime.url}/desktop/automation-mode/live`,
