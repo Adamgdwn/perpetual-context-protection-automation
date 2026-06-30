@@ -19,6 +19,7 @@ import type {
   DesktopEventLogEntry,
   DesktopSessionCard,
   DesktopStateResponse,
+  SessionAutomationMode,
   SessionCardStatus
 } from "../../shared/protocol";
 
@@ -107,6 +108,15 @@ export function App(): ReactElement {
         </nav>
 
         <div className="topbar-actions">
+          <AutomationModeControl
+            mode={state?.automation.mode ?? "dry-run"}
+            disabled={actionCardId === "automation-mode"}
+            onChange={(mode) =>
+              void runAction("automation-mode", () =>
+                desktopApi.setAutomationMode(mode)
+              )
+            }
+          />
           <StatusPill
             label={state?.connection.bridgeOnline ? "Bridge online" : "Bridge offline"}
             tone={state?.connection.bridgeOnline ? "good" : "danger"}
@@ -130,7 +140,7 @@ export function App(): ReactElement {
             <Metric label="Windows" value={state?.connection.heartbeatCount ?? 0} />
             <Metric label="Sessions" value={state?.connection.sessionCount ?? 0} />
             <Metric label="Managed" value={counts.managed} />
-            <Metric label="Armed" value={counts.armed} />
+            <Metric label="Watching" value={counts.watching} />
             <Metric label="Candidates" value={counts.candidate} />
           </div>
 
@@ -255,10 +265,15 @@ function SessionCard(props: {
         <div className="card-facts">
           <Fact label="Observability" value={card.observability} />
           <Fact label="Status" value={card.status} />
+          <Fact label="Mode" value={card.automationMode} />
+          <Fact label="Decision" value={card.lastDecision?.state ?? "none"} />
           <Fact label="Chunks" value={String(card.chunkCount)} />
         </div>
 
         <p className="last-event">{card.lastEvent}</p>
+        {card.lastDecision ? (
+          <p className="decision-summary">{card.lastDecision.summary}</p>
+        ) : null}
         <p className="reason">{card.reason}</p>
       </div>
 
@@ -354,7 +369,16 @@ function EventLog(props: { events: DesktopEventLogEntry[] }): ReactElement {
       {events.map((event) => (
         <li key={event.id}>
           <time>{formatTime(event.timestamp)}</time>
-          <span>{event.message}</span>
+          <div>
+            <span>{event.message}</span>
+            {event.details?.length ? (
+              <ul className="event-details">
+                {event.details.map((detail) => (
+                  <li key={detail}>{detail}</li>
+                ))}
+              </ul>
+            ) : null}
+          </div>
         </li>
       ))}
     </ol>
@@ -386,6 +410,35 @@ function StatusPill(props: {
   return <span className={`status-pill ${props.tone}`}>{props.label}</span>;
 }
 
+function AutomationModeControl(props: {
+  mode: SessionAutomationMode;
+  disabled: boolean;
+  onChange: (mode: SessionAutomationMode) => void;
+}): ReactElement {
+  return (
+    <div className="mode-toggle" aria-label="Automation mode">
+      <button
+        className={props.mode === "dry-run" ? "active" : ""}
+        type="button"
+        disabled={props.disabled}
+        onClick={() => props.onChange("dry-run")}
+      >
+        <ShieldCheck size={15} />
+        Dry Run
+      </button>
+      <button
+        className={props.mode === "live" ? "active" : ""}
+        type="button"
+        disabled={props.disabled}
+        onClick={() => props.onChange("live")}
+      >
+        <Play size={15} />
+        Live
+      </button>
+    </div>
+  );
+}
+
 function StatusDot(props: { status: SessionCardStatus }): ReactElement {
   return (
     <span className={`status-dot status-${props.status}`} title={props.status}>
@@ -396,17 +449,23 @@ function StatusDot(props: { status: SessionCardStatus }): ReactElement {
 
 function summarizeCards(cards: DesktopSessionCard[]): {
   managed: number;
-  armed: number;
+  watching: number;
   candidate: number;
 } {
   return cards.reduce(
     (summary, card) => ({
       managed: summary.managed + (card.observability === "managed" ? 1 : 0),
-      armed: summary.armed + (card.automationState === "armed" ? 1 : 0),
+      watching:
+        summary.watching +
+        (["watching", "compacting", "resuming", "dry-run-ready"].includes(
+          card.automationState
+        )
+          ? 1
+          : 0),
       candidate:
         summary.candidate + (card.observability === "candidate" ? 1 : 0)
     }),
-    { managed: 0, armed: 0, candidate: 0 }
+    { managed: 0, watching: 0, candidate: 0 }
   );
 }
 

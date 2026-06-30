@@ -9,6 +9,7 @@ import {
   type DesktopStateResponse,
   type ExtensionHeartbeat,
   type SendInputRequest,
+  type SessionAutomationMode,
   type StartSessionRequest
 } from "../shared/protocol";
 import { DesktopStateStore } from "./desktopState";
@@ -31,6 +32,7 @@ interface BridgeState {
   heartbeats: Map<string, ExtensionHeartbeat>;
   sessions: Map<string, ManagedPtySession>;
   desktop: DesktopStateStore;
+  automationTimer: NodeJS.Timeout | undefined;
 }
 
 export const DEFAULT_BRIDGE_HOST = "127.0.0.1";
@@ -44,7 +46,8 @@ export async function startBridgeServer(
   const state: BridgeState = {
     heartbeats: new Map(),
     sessions: new Map(),
-    desktop: new DesktopStateStore()
+    desktop: new DesktopStateStore(),
+    automationTimer: undefined
   };
 
   const server = createServer((request, response) => {
@@ -59,6 +62,11 @@ export async function startBridgeServer(
     });
   });
 
+  state.automationTimer = setInterval(() => {
+    state.desktop.evaluateAutomation([...state.sessions.values()]);
+  }, 1000);
+  state.automationTimer.unref();
+
   const address = server.address() as AddressInfo;
 
   return {
@@ -68,6 +76,10 @@ export async function startBridgeServer(
     url: `http://${host}:${address.port}`,
     close: () =>
       new Promise((resolve, reject) => {
+        if (state.automationTimer) {
+          clearInterval(state.automationTimer);
+          state.automationTimer = undefined;
+        }
         for (const session of state.sessions.values()) {
           session.stop();
         }
@@ -198,6 +210,20 @@ async function handleRequest(
 
     if (request.method === "POST" && url.pathname === "/desktop/arm-all") {
       sendDesktopAction(response, state.desktop.armAll(desktopInput(state)));
+      return;
+    }
+
+    const automationModeMatch = url.pathname.match(
+      /^\/desktop\/automation-mode\/(dry-run|live)$/u
+    );
+    if (request.method === "POST" && automationModeMatch) {
+      sendDesktopAction(
+        response,
+        state.desktop.setAutomationMode(
+          automationModeMatch[1] as SessionAutomationMode,
+          desktopInput(state)
+        )
+      );
       return;
     }
 

@@ -2,6 +2,13 @@
 
 ## Unreleased
 
+- 2026-06-29: Added Chunk Four implementation checkpoint. Introduced the
+  bridge-side compact-cycle automation controller, dry-run/live mode, detector
+  evidence in desktop logs, pause-safe compact/resume state handling,
+  Linux desktop launcher scripts, and automated coverage for dry-run, live
+  compact gating, resume gating, double-fire prevention, stop states, and pause
+  behavior. Manual human-observed Claude/Codex live-cycle evidence remains
+  pending before Chunk Four is integration complete.
 - 2026-06-29: Completed Chunk Three task. Added coder-agnostic agent profile
   schema fields, built-in Claude/Codex signal profiles, conservative
   multi-signal detector, targeted `test:signal` script, and fixture-based

@@ -1,5 +1,7 @@
 # Perpetual Context Protection Automation
 
+Last updated: 2026-06-29T20:29:52-06:00
+
 ## Purpose
 
 A reusable desktop app and VS Code companion extension for protecting long
@@ -21,7 +23,7 @@ complete or blocked.
 - Technical lead: hybrid session (Claude Code + Codex)
 - Governance level: 1
 - Risk tier: low
-- Production status: Chunk Three task complete - one managed compact cycle next
+- Production status: Chunk Four implementation checkpoint - manual live cycle pending
 - Planned public repo name: `perpetual-context-protection-automation`
 
 ## Quick Start
@@ -54,6 +56,18 @@ Launch the draft desktop shell locally with:
 source /home/adamgoodwin/.nvm/nvm.sh
 nvm use --silent
 npm run desktop:launch
+```
+
+Install or refresh the Linux desktop launcher with:
+
+```bash
+npm run desktop:install-linux-launcher
+```
+
+On this workstation the launcher is installed at:
+
+```text
+/home/adamgoodwin/Desktop/Perpetual Context Protection.desktop
 ```
 
 ## Key Files

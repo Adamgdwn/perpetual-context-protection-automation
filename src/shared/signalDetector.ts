@@ -1,18 +1,11 @@
-import type { AgentProfileId } from "./protocol";
+import type { AgentProfileId, SessionSignalState } from "./protocol";
 import {
   resolveAgentProfile,
   type AgentSignalPattern,
   type ResolvedAgentProfile
 } from "./profiles";
 
-export type SignalDetectorState =
-  | "chunk-boundary"
-  | "task-complete"
-  | "blocked"
-  | "needs-human"
-  | "compacting"
-  | "active"
-  | "uncertain";
+export type SignalDetectorState = SessionSignalState;
 
 export type SignalEvidenceKind =
   | "explicit-marker"

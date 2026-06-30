@@ -1,7 +1,7 @@
 # Start Here
 
-Last Updated: 2026-06-29T20:11:30-06:00
-Status: Chunk Three task complete - ready for Chunk Four
+Last Updated: 2026-06-29T20:29:52-06:00
+Status: Chunk Four implementation checkpoint - manual live cycle pending
 Owner: Adam Goodwin
 
 ## 2026-06-29 Chunk Zero Completion Handoff
@@ -20,7 +20,7 @@ Resume rule for the next implementation session:
 2. Run `git status --short`.
 3. Read this file and `docs/current-build-pathway.md`.
 4. Do not restart from the superseded tmux/n8n plan in `PLAN.md`.
-5. Start Chunk Four, one managed compact cycle.
+5. Continue Chunk Four with the human-observed dry-run then live compact cycle.
 
 Most important product decision:
 
@@ -113,11 +113,11 @@ and architecture plan. `PLAN.md` is retained as superseded tmux/n8n research.
 
 Current priorities:
 
-- **Start Chunk Four** - one managed compact cycle, dry-run first
+- **Continue Chunk Four** - launch the desktop app from `/home/adamgoodwin/Desktop/Perpetual Context Protection.desktop`, dry-run first, then live only while Adam watches
 - Build VS Code-first, coder-agnostic behavior before optional tmux or n8n adapters
 - Treat terminal observability as explicit session metadata: managed, adoptable, candidate, or unsupported
 - Use multi-signal pause detection, not a single required `===CHUNK_DONE===` phrase
-- Capture or review a disposable live Claude/Codex transcript sample before live compact mode
+- Capture or review a disposable live Claude/Codex transcript sample before or during live compact mode
 - Apply `docs/policy/durable-development-engineering-policy.md` during implementation
 - Apply `docs/standards/ship-ready-engineering-standard.md` before declaring any chunk complete
 - Use `docs/context-map.md` as the routing map for task-specific context loads

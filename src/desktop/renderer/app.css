@@ -124,6 +124,7 @@ h3 {
 }
 
 .pane-tabs button,
+.mode-toggle button,
 .primary-action,
 .icon-button {
   min-height: 34px;
@@ -141,7 +142,32 @@ h3 {
   background: transparent;
 }
 
+.mode-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px;
+  border: 1px solid #d2d8e1;
+  border-radius: 8px;
+  background: #f7f9fb;
+}
+
+.mode-toggle button {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0 10px;
+  color: #4c5664;
+  background: transparent;
+}
+
 .pane-tabs button.active {
+  color: #20242a;
+  background: #ffffff;
+  border-color: #cdd4df;
+}
+
+.mode-toggle button.active {
   color: #20242a;
   background: #ffffff;
   border-color: #cdd4df;
@@ -191,12 +217,14 @@ h3 {
 
 .icon-button:hover:not(:disabled),
 .primary-action:hover:not(:disabled),
-.pane-tabs button:hover {
+.pane-tabs button:hover,
+.mode-toggle button:hover {
   border-color: #8ca0b8;
 }
 
 .icon-button:disabled,
-.primary-action:disabled {
+.primary-action:disabled,
+.mode-toggle button:disabled {
   cursor: not-allowed;
   color: #9aa4b2;
   background: #eef1f5;
@@ -361,16 +389,24 @@ h3 {
 }
 
 .status-running,
-.status-armed {
+.status-watching,
+.status-dry-run-ready,
+.status-resuming,
+.status-complete {
   color: #138858;
 }
 
-.status-paused {
+.status-paused,
+.status-compacting {
   color: #bd7800;
 }
 
 .status-exited,
-.status-unsupported {
+.status-unsupported,
+.status-blocked,
+.status-needs-human,
+.status-uncertain,
+.status-error {
   color: #bc3939;
 }
 
@@ -400,13 +436,20 @@ h3 {
 }
 
 .last-event,
-.reason {
+.reason,
+.decision-summary {
   overflow-wrap: anywhere;
 }
 
 .last-event {
   color: #28313d;
   font-weight: 700;
+}
+
+.decision-summary {
+  color: #334155;
+  font-size: 12px;
+  line-height: 1.35;
 }
 
 .card-actions {
@@ -437,7 +480,7 @@ h3 {
   list-style: none;
 }
 
-.event-log li {
+.event-log > li {
   display: grid;
   grid-template-columns: 74px minmax(0, 1fr);
   gap: 10px;
@@ -449,6 +492,20 @@ h3 {
   overflow-wrap: anywhere;
   font-size: 13px;
   line-height: 1.35;
+}
+
+.event-details {
+  display: grid;
+  gap: 3px;
+  margin: 6px 0 0;
+  padding-left: 14px;
+  color: #687386;
+  font-size: 11px;
+  line-height: 1.35;
+}
+
+.event-details li {
+  overflow-wrap: anywhere;
 }
 
 .settings-pane {
@@ -510,6 +567,7 @@ h3 {
 
   .topbar-actions {
     justify-content: space-between;
+    flex-wrap: wrap;
   }
 
   .workspace {

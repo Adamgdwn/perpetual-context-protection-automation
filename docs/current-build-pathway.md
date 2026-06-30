@@ -1,7 +1,7 @@
 # Current Build Pathway
 
-Last Updated: 2026-06-29T20:11:30-06:00
-Status: Chunk Three task complete - Chunk Four ready
+Last Updated: 2026-06-29T20:29:52-06:00
+Status: Chunk Four implementation checkpoint - manual live cycle pending
 Owner: Technical Lead
 
 > **Single active pathway document.** This is the live path from planning to a
@@ -65,7 +65,7 @@ human decision.
 | Chunk One - VS Code integration spike | done | 2026-06-29T19:18:45-06:00 | build agent | Bridge-owned `node-pty` path proved on Linux; Windows validation handoff recorded |
 | Chunk Two - Desktop shell and session cards | done | 2026-06-29T19:37:10-06:00 | build agent | Electron desktop shell, bridge desktop state, session cards, logs, and guarded operator actions |
 | Chunk Three - Agent profiles and signal detector | done | 2026-06-29T20:11:30-06:00 | build agent | Claude/Codex profiles, multi-signal boundary detection |
-| Chunk Four - One managed compact cycle | active | 2026-06-29T20:11:30-06:00 | build agent | Safe dry-run then live compact/resume for one session |
+| Chunk Four - One managed compact cycle | active | 2026-06-29T20:29:52-06:00 | build agent | State machine, dry-run/live mode, desktop launcher, and automated validation complete; manual live cycle pending |
 | Chunk Five - Multi-session arm/pause/all control | pending | - | build agent | Multiple session cards, operator approvals, logs |
 | Chunk Six - Windows/Linux packaging | pending | - | build agent | Installable app + extension setup |
 | Chunk Seven - Public release hardening | pending | - | build agent | Docs, examples, security notes, GitHub release path |
@@ -360,13 +360,14 @@ Outputs:
 
 Acceptance criteria:
 
-- [ ] Dry-run logs "would compact" without sending text
-- [ ] Live mode sends the profile compact command only after boundary + idle agreement
-- [ ] System waits for compaction to finish before sending resume
-- [ ] Resume text is profile-configurable
-- [ ] Double-fire protection prevents repeated compacts for the same boundary
-- [ ] If task is complete, blocked, or uncertain, no compact command is sent
-- [ ] Operator can pause before or during watching
+- [x] Dry-run logs "would compact" without sending text
+- [x] Live mode sends the profile compact command only after boundary + idle agreement in automated coverage
+- [x] System waits for compaction to finish before sending resume
+- [x] Resume text is profile-configurable
+- [x] Double-fire protection prevents repeated compacts for the same boundary
+- [x] If task is complete, blocked, or uncertain, no compact command is sent
+- [x] Operator can pause before or during watching
+- [ ] Manual live managed Claude/Codex cycle is captured while Adam watches
 
 Validation:
 
@@ -376,6 +377,23 @@ npm test
 npm run build
 # manual live cycle evidence recorded here
 ```
+
+Implementation evidence:
+
+- 2026-06-29T20:18:41-06:00: `bash scripts/governance-preflight.sh` passed with 0 warnings before Chunk Four autonomous-session work.
+- 2026-06-29T20:29:52-06:00: Added bridge-side automation state machine with explicit dry-run/live mode, watching, compacting, resuming, stop states, detector evidence, and per-session chunk counts.
+- 2026-06-29T20:29:52-06:00: Added automated coverage for dry-run "would compact" logging, live compact command gating, quiet-period resume gating, double-fire prevention, terminal stop states, and pause-before/pause-during behavior.
+- 2026-06-29T20:29:52-06:00: Desktop cards now show automation mode and last detector decision; event log entries include detector evidence details.
+- 2026-06-29T20:29:52-06:00: Added Linux launcher scripts and installed a desktop icon at `/home/adamgoodwin/Desktop/Perpetual Context Protection.desktop`.
+- 2026-06-29T20:29:52-06:00: `npm test` passed with 15 unit tests.
+- 2026-06-29T20:29:52-06:00: `npm run lint` passed.
+- 2026-06-29T20:29:52-06:00: `npm run build` passed.
+- 2026-06-29T20:29:52-06:00: `npm run desktop:smoke` passed under `xvfb`; Electron emitted headless DBus warnings but exited successfully.
+- 2026-06-29T20:29:52-06:00: `npm run test:vscode` passed under `xvfb`; extension-host managed-session proof remains healthy.
+
+Close-out state: Draft complete for the Chunk Four implementation. The remaining
+integration evidence is a human-observed dry-run, then live Claude/Codex compact
+cycle using the desktop launcher and VS Code companion extension.
 
 Stop condition: Stop after two repeated false positives, missed boundaries, or
 unsafe injections. Capture logs and revise detector before continuing.
@@ -561,9 +579,18 @@ sole reason to inject text.
 |---|---|---|---|
 | 2026-06-29T18:37:53-06:00 | `git status --short` | failed | Directory is not currently a Git repository. |
 | 2026-06-29T18:37:53-06:00 | `bash scripts/governance-preflight.sh` | pass | Planning scaffold passes current required-file check. |
+| 2026-06-29T20:18:41-06:00 | `bash scripts/governance-preflight.sh` | pass | Chunk Four autonomous-session work passed preflight with 0 warnings. |
+| 2026-06-29T20:29:52-06:00 | `npm test` | pass | 15 unit tests, including compact-cycle automation controller coverage. |
+| 2026-06-29T20:29:52-06:00 | `npm run lint` | pass | ESLint passed for source, tests, and Vite config. |
+| 2026-06-29T20:29:52-06:00 | `npm run build` | pass | TypeScript compile and desktop renderer production build passed. |
+| 2026-06-29T20:29:52-06:00 | `npm run desktop:smoke` | pass | Electron loaded under `xvfb`; headless DBus warnings only. |
+| 2026-06-29T20:29:52-06:00 | `npm run test:vscode` | pass | VS Code extension-host test passed under `xvfb`. |
 
 ## Next Handoff
 
-Next agent should start with Chunk Zero. Do not implement tmux/n8n watcher code
-from `PLAN.md` unless Adam explicitly reopens that path. The current goal is a
-VS Code-first, cross-platform desktop app plus companion extension.
+Continue Chunk Four with a human-observed managed session test. Adam can launch
+the desktop app from `/home/adamgoodwin/Desktop/Perpetual Context Protection.desktop`.
+Use dry-run mode first, start or attach one managed Claude/Codex session through
+the VS Code companion extension, verify the event log records detector evidence
+and "would compact", then switch to live mode only when Adam is watching and
+ready to pause if needed.

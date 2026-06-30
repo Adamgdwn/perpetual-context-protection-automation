@@ -24,6 +24,8 @@ export class ManagedPtySession {
   public readonly profile;
   public readonly startedAt = new Date().toISOString();
   public status: "starting" | "running" | "exited" = "starting";
+  public lastOutputAt: string | undefined;
+  public lastInputAt: string | undefined;
   public exitCode: number | undefined;
 
   private readonly options: ManagedPtySessionOptions;
@@ -55,6 +57,7 @@ export class ManagedPtySession {
     });
 
     this.process.onData((data) => {
+      this.lastOutputAt = new Date().toISOString();
       this.outputChunks.push(data);
       for (const listener of this.outputListeners) {
         listener(data);
@@ -75,6 +78,7 @@ export class ManagedPtySession {
       throw new Error(`Managed session ${this.id} is not running`);
     }
 
+    this.lastInputAt = new Date().toISOString();
     this.process.write(data);
   }
 
@@ -113,6 +117,8 @@ export class ManagedPtySession {
       status: this.status,
       command: [this.profile.command, ...this.profile.args].join(" "),
       outputLength: this.getOutput().length,
+      lastOutputAt: this.lastOutputAt,
+      lastInputAt: this.lastInputAt,
       exitCode: this.exitCode
     };
   }

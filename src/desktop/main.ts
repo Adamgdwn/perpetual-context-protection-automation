@@ -127,6 +127,7 @@ async function requestBridge<T>(
 function isAllowedDesktopActionPath(path: string): boolean {
   return (
     path === "/desktop/arm-all" ||
+    /^\/desktop\/automation-mode\/(?:dry-run|live)$/u.test(path) ||
     /^\/desktop\/cards\/[^/]+\/(?:arm|pause|dismiss)$/u.test(path)
   );
 }

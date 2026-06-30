@@ -1,6 +1,7 @@
 import type {
   DesktopActionResponse,
-  DesktopStateResponse
+  DesktopStateResponse,
+  SessionAutomationMode
 } from "../../shared/protocol";
 
 const defaultBridgeUrl = "http://127.0.0.1:47320";
@@ -11,6 +12,7 @@ export interface DesktopApi {
   pauseCard: (cardId: string) => Promise<DesktopActionResponse>;
   dismissCard: (cardId: string) => Promise<DesktopActionResponse>;
   armAll: () => Promise<DesktopActionResponse>;
+  setAutomationMode: (mode: SessionAutomationMode) => Promise<DesktopActionResponse>;
 }
 
 export function createDesktopApi(): DesktopApi {
@@ -35,7 +37,12 @@ export function createDesktopApi(): DesktopApi {
         `/desktop/cards/${encodeURIComponent(cardId)}/dismiss`,
         "POST"
       ),
-    armAll: () => requestBridge<DesktopActionResponse>("/desktop/arm-all", "POST")
+    armAll: () => requestBridge<DesktopActionResponse>("/desktop/arm-all", "POST"),
+    setAutomationMode: (mode) =>
+      requestBridge<DesktopActionResponse>(
+        `/desktop/automation-mode/${mode}`,
+        "POST"
+      )
   };
 }
 

@@ -6,6 +6,7 @@ import {
   type DesktopSessionCard,
   type DesktopStateResponse,
   type ExtensionHeartbeat,
+  type SessionAutomationMode,
   type SessionAutomationState,
   type SessionCardStatus,
   type TerminalSummary
@@ -14,6 +15,12 @@ import {
   BUILT_IN_AGENT_PROFILE_IDS,
   resolveAgentProfile
 } from "../shared/profiles";
+import {
+  AutomationController,
+  type AutomatableSession,
+  type AutomationRuntimeEvent
+} from "./automationController";
+import { managedCardId, terminalCardId, workspaceCardId } from "./cardIds";
 
 interface DesktopStateActionResult {
   statusCode: number;
@@ -26,7 +33,7 @@ interface CardBuildInput {
 }
 
 export class DesktopStateStore {
-  private readonly automationByCardId = new Map<string, SessionAutomationState>();
+  private readonly automation = new AutomationController();
   private readonly dismissedCardIds = new Set<string>();
   private readonly eventLog: DesktopEventLogEntry[] = [];
   private eventSequence = 0;
@@ -49,12 +56,31 @@ export class DesktopStateStore {
   }
 
   public recordSessionInput(session: BridgeSessionSummary): void {
+    this.automation.recordManualInput(managedCardId(session.id));
     this.appendEvent({
       kind: "session-input",
       cardId: managedCardId(session.id),
       workspaceId: session.workspaceId,
       message: `Input sent to ${displayNameForProfile(session.profileId)} in ${session.workspaceName}`
     });
+  }
+
+  public evaluateAutomation(sessions: AutomatableSession[]): void {
+    for (const event of this.automation.evaluateSessions(sessions)) {
+      this.recordAutomationEvent(event);
+    }
+  }
+
+  public setAutomationMode(
+    mode: SessionAutomationMode,
+    input: CardBuildInput
+  ): DesktopStateActionResult {
+    this.automation.setMode(mode);
+    this.appendEvent({
+      kind: "automation-mode",
+      message: `Automation mode set to ${mode}`
+    });
+    return this.actionResponse([], input);
   }
 
   public createState(input: CardBuildInput): DesktopStateResponse {
@@ -64,6 +90,9 @@ export class DesktopStateStore {
     return {
       protocolVersion: PROTOCOL_VERSION,
       generatedAt: new Date().toISOString(),
+      automation: {
+        mode: this.automation.getMode()
+      },
       connection: {
         bridgeOnline: true,
         heartbeatCount: input.heartbeats.length,
@@ -100,12 +129,12 @@ export class DesktopStateStore {
       };
     }
 
-    this.automationByCardId.set(card.id, "armed");
+    const snapshot = this.automation.armCard(card.id);
     this.appendEvent({
       kind: "session-armed",
       cardId: card.id,
       workspaceId: card.workspaceId,
-      message: `${card.agentLabel} armed for ${card.workspaceName}`,
+      message: `${card.agentLabel} watching in ${snapshot.mode} mode for ${card.workspaceName}`,
       affectedCardIds: [card.id]
     });
 
@@ -118,7 +147,7 @@ export class DesktopStateStore {
       return { statusCode: 404, body: { ok: false, error: "Session card not found" } };
     }
 
-    this.automationByCardId.set(card.id, "paused");
+    this.automation.pauseCard(card.id);
     this.appendEvent({
       kind: "session-paused",
       cardId: card.id,
@@ -137,7 +166,7 @@ export class DesktopStateStore {
     }
 
     this.dismissedCardIds.add(card.id);
-    this.automationByCardId.delete(card.id);
+    this.automation.dismissCard(card.id);
     this.appendEvent({
       kind: "session-dismissed",
       cardId: card.id,
@@ -155,7 +184,7 @@ export class DesktopStateStore {
     const affectedCardIds = eligibleCards.map((card) => card.id);
 
     for (const card of eligibleCards) {
-      this.automationByCardId.set(card.id, "armed");
+      this.automation.armCard(card.id);
     }
 
     this.appendEvent({
@@ -216,7 +245,8 @@ export class DesktopStateStore {
 
   private createManagedCard(session: BridgeSessionSummary): DesktopSessionCard {
     const cardId = managedCardId(session.id);
-    const automationState = this.automationByCardId.get(cardId) ?? "idle";
+    const automationSnapshot = this.automation.getSnapshot(cardId);
+    const automationState = automationSnapshot.state;
     const latestEvent = this.latestEventFor(cardId, session.workspaceId);
 
     return {
@@ -229,12 +259,14 @@ export class DesktopStateStore {
       observability: "managed",
       status: statusForManagedSession(session.status, automationState),
       automationState,
+      automationMode: automationSnapshot.mode,
       canArm: session.status !== "exited",
       canArmAll: session.status !== "exited",
       reason: "Managed bridge session with controlled PTY read/write.",
       lastEvent: latestEvent.message,
       lastEventAt: latestEvent.timestamp,
-      chunkCount: 0
+      chunkCount: automationSnapshot.chunkCount,
+      lastDecision: automationSnapshot.lastDecision
     };
   }
 
@@ -243,7 +275,8 @@ export class DesktopStateStore {
     terminal: TerminalSummary
   ): DesktopSessionCard {
     const cardId = terminalCardId(heartbeat.windowId, terminal.id);
-    const automationState = this.automationByCardId.get(cardId) ?? "idle";
+    const automationSnapshot = this.automation.getSnapshot(cardId);
+    const automationState = automationSnapshot.state;
     const latestEvent = this.latestEventFor(cardId, heartbeat.workspace.id);
 
     return {
@@ -259,18 +292,21 @@ export class DesktopStateStore {
       observability: terminal.observability,
       status: statusForObservedTerminal(terminal.observability, automationState),
       automationState,
+      automationMode: automationSnapshot.mode,
       canArm: terminal.observability === "managed",
       canArmAll: terminal.observability === "managed",
       reason: terminal.reason,
       lastEvent: latestEvent.message,
       lastEventAt: latestEvent.timestamp,
-      chunkCount: 0
+      chunkCount: automationSnapshot.chunkCount,
+      lastDecision: automationSnapshot.lastDecision
     };
   }
 
   private createWorkspaceCard(heartbeat: ExtensionHeartbeat): DesktopSessionCard {
     const cardId = workspaceCardId(heartbeat.windowId);
-    const automationState = this.automationByCardId.get(cardId) ?? "idle";
+    const automationSnapshot = this.automation.getSnapshot(cardId);
+    const automationState = automationSnapshot.state;
     const latestEvent = this.latestEventFor(cardId, heartbeat.workspace.id);
 
     return {
@@ -283,12 +319,14 @@ export class DesktopStateStore {
       observability: "candidate",
       status: statusForObservedTerminal("candidate", automationState),
       automationState,
+      automationMode: automationSnapshot.mode,
       canArm: false,
       canArmAll: false,
       reason: "VS Code window heartbeat received; no managed coder terminal reported yet.",
       lastEvent: latestEvent.message,
       lastEventAt: latestEvent.timestamp,
-      chunkCount: 0
+      chunkCount: automationSnapshot.chunkCount,
+      lastDecision: automationSnapshot.lastDecision
     };
   }
 
@@ -318,18 +356,10 @@ export class DesktopStateStore {
       ...event
     });
   }
-}
 
-function managedCardId(sessionId: string): string {
-  return `managed:${sessionId}`;
-}
-
-function terminalCardId(windowId: string, terminalId: string): string {
-  return `terminal:${windowId}:${terminalId}`;
-}
-
-function workspaceCardId(windowId: string): string {
-  return `workspace:${windowId}`;
+  private recordAutomationEvent(event: AutomationRuntimeEvent): void {
+    this.appendEvent(event);
+  }
 }
 
 function displayNameForProfile(profileId: BridgeSessionSummary["profileId"]): string {
@@ -340,26 +370,27 @@ function statusForManagedSession(
   sessionStatus: BridgeSessionSummary["status"],
   automationState: SessionAutomationState
 ): SessionCardStatus {
-  if (automationState === "armed") {
-    return "armed";
-  }
-  if (automationState === "paused") {
-    return "paused";
-  }
-  return sessionStatus;
+  return statusFromAutomationState(automationState) ?? sessionStatus;
 }
 
 function statusForObservedTerminal(
   observability: TerminalSummary["observability"],
   automationState: SessionAutomationState
 ): SessionCardStatus {
-  if (automationState === "armed") {
-    return "armed";
-  }
-  if (automationState === "paused") {
-    return "paused";
+  const automationStatus = statusFromAutomationState(automationState);
+  if (automationStatus) {
+    return automationStatus;
   }
   return observability === "unsupported" ? "unsupported" : "detected";
+}
+
+function statusFromAutomationState(
+  automationState: SessionAutomationState
+): SessionCardStatus | undefined {
+  if (automationState === "idle") {
+    return undefined;
+  }
+  return automationState;
 }
 
 function latestTimestamp(timestamps: string[]): string | undefined {

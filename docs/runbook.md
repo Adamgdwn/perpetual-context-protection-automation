@@ -1,5 +1,7 @@
 # Runbook
 
+Last updated: 2026-06-29T20:29:52-06:00
+
 ## Purpose
 
 In operation, the desktop app receives VS Code extension heartbeats, shows
@@ -26,6 +28,13 @@ cycles only when detector and idle evidence agree.
 - VS Code companion extension installed and enabled.
 - Claude and/or Codex CLI available on the target machine.
 - Local bridge reachable on localhost.
+
+## Launch
+
+- Use `/home/adamgoodwin/Desktop/Perpetual Context Protection.desktop` on this Linux workstation.
+- If the icon needs to be refreshed, run `npm run desktop:install-linux-launcher`.
+- Keep automation mode on `Dry Run` for the first observed cycle. Switch to
+  `Live` only when Adam is watching and ready to pause.
 
 ## Recovery
 

@@ -8,15 +8,45 @@ export type ObservabilityLevel =
   | "candidate"
   | "unsupported";
 
-export type SessionAutomationState = "idle" | "armed" | "paused";
+export type SessionSignalState =
+  | "chunk-boundary"
+  | "task-complete"
+  | "blocked"
+  | "needs-human"
+  | "compacting"
+  | "active"
+  | "uncertain";
+
+export type SessionAutomationMode = "dry-run" | "live";
+
+export type SessionAutomationState =
+  | "idle"
+  | "watching"
+  | "paused"
+  | "dry-run-ready"
+  | "compacting"
+  | "resuming"
+  | "complete"
+  | "blocked"
+  | "needs-human"
+  | "uncertain"
+  | "error";
 
 export type SessionCardStatus =
   | "detected"
   | "starting"
   | "running"
   | "exited"
-  | "armed"
+  | "watching"
   | "paused"
+  | "dry-run-ready"
+  | "compacting"
+  | "resuming"
+  | "complete"
+  | "blocked"
+  | "needs-human"
+  | "uncertain"
+  | "error"
   | "unsupported";
 
 export type DesktopEventKind =
@@ -26,7 +56,13 @@ export type DesktopEventKind =
   | "session-armed"
   | "session-paused"
   | "session-dismissed"
-  | "arm-all";
+  | "arm-all"
+  | "automation-mode"
+  | "automation-decision"
+  | "automation-dry-run"
+  | "automation-compact"
+  | "automation-resume"
+  | "automation-stop";
 
 export interface WorkspaceIdentity {
   id: string;
@@ -73,6 +109,8 @@ export interface BridgeSessionSummary {
   status: "starting" | "running" | "exited";
   command: string;
   outputLength: number;
+  lastOutputAt?: string;
+  lastInputAt?: string;
   exitCode?: number;
 }
 
@@ -94,12 +132,31 @@ export interface DesktopSessionCard {
   observability: ObservabilityLevel;
   status: SessionCardStatus;
   automationState: SessionAutomationState;
+  automationMode: SessionAutomationMode;
   canArm: boolean;
   canArmAll: boolean;
   reason: string;
   lastEvent: string;
   lastEventAt: string;
   chunkCount: number;
+  lastDecision?: DesktopSignalDecision;
+}
+
+export interface DesktopSignalEvidence {
+  kind: string;
+  id: string;
+  description: string;
+  excerpt?: string;
+}
+
+export interface DesktopSignalDecision {
+  state: SessionSignalState;
+  shouldCompact: boolean;
+  stopAutomation: boolean;
+  summary: string;
+  evidence: DesktopSignalEvidence[];
+  timestamp: string;
+  quietForMs?: number;
 }
 
 export interface DesktopEventLogEntry {
@@ -110,11 +167,15 @@ export interface DesktopEventLogEntry {
   cardId?: string;
   workspaceId?: string;
   affectedCardIds?: string[];
+  details?: string[];
 }
 
 export interface DesktopStateResponse {
   protocolVersion: typeof PROTOCOL_VERSION;
   generatedAt: string;
+  automation: {
+    mode: SessionAutomationMode;
+  };
   connection: DesktopConnectionSummary;
   cards: DesktopSessionCard[];
   events: DesktopEventLogEntry[];

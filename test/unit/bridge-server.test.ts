@@ -100,6 +100,13 @@ void test("desktop state exposes cards, logs, and guarded operator actions", asy
     assert.equal(managedCard.canArmAll, true);
     assert.equal(candidateCard.canArm, false);
     assert.equal(candidateCard.observability, "candidate");
+    assert.equal(initialState.automation.mode, "dry-run");
+
+    const liveMode = await postJson<DesktopActionResponse>(
+      `${runtime.url}/desktop/automation-mode/live`,
+      {}
+    );
+    assert.equal(liveMode.state.automation.mode, "live");
 
     const armAll = await postJson<DesktopActionResponse>(
       `${runtime.url}/desktop/arm-all`,
@@ -108,7 +115,7 @@ void test("desktop state exposes cards, logs, and guarded operator actions", asy
     assert.deepEqual(armAll.affectedCardIds, [managedCard.id]);
     assert.equal(
       armAll.state.cards.find((card) => card.id === managedCard.id)?.automationState,
-      "armed"
+      "watching"
     );
     assert.equal(
       armAll.state.cards.find((card) => card.id === candidateCard.id)?.automationState,

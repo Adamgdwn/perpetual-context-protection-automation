@@ -70,7 +70,8 @@
     "test:vscode": "npm run compile && xvfb-run -a node dist/test/vscode/runTest.js",
     "build": "npm run compile && vite build --config vite.desktop.config.mts",
     "desktop:launch": "npm run build && electron dist/src/desktop/main.js",
-    "desktop:smoke": "npm run build && xvfb-run -a electron dist/src/desktop/main.js --smoke"
+    "desktop:smoke": "npm run build && xvfb-run -a electron dist/src/desktop/main.js --smoke",
+    "desktop:install-linux-launcher": "bash scripts/install-linux-desktop-launcher.sh"
   },
   "dependencies": {
     "lucide-react": "^1.22.0",
