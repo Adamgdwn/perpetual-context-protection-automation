@@ -1,7 +1,7 @@
 # Current Build Pathway
 
-Last Updated: 2026-06-29T22:05:13-06:00
-Status: Chunk Six Linux companion setup proof complete - Windows packaging pending
+Last Updated: 2026-06-29T22:17:36-06:00
+Status: Chunk Six operator-guide polish complete - Windows packaging pending
 Owner: Technical Lead
 
 > **Single active pathway document.** This is the live path from planning to a
@@ -529,6 +529,8 @@ Implementation evidence:
 - 2026-06-29T22:05:13-06:00: Installed the companion extension into Adam's normal VS Code profile. The live bridge changed from zero heartbeats to four detected VS Code windows, including `perpetual-context-protection-automation`, `agentic-multi-agent-agent-builder`, `the-freedom-engine-os`, and one untitled VS Code window.
 - 2026-06-29T22:05:13-06:00: Added bridge-side setup detection for the local VS Code companion extension and a desktop empty state that distinguishes missing companion extension, waiting VS Code windows, and bridge offline states.
 - 2026-06-29T22:05:13-06:00: Refreshed the Linux launcher install path so the infinity icon is installed into the user icon theme as `perpetual-context-protection`.
+- 2026-06-29T22:17:36-06:00: Added a desktop operator-guide drawer that explains candidate versus managed cards, companion setup, managed Claude/Codex launch commands, dry-run/live mode, arm behavior, and automation stop states.
+- 2026-06-29T22:17:36-06:00: Extended desktop smoke validation so it opens the operator-guide drawer and requires the `Operator Guide` content before passing.
 
 Close-out state: Task complete for the Linux companion install/setup slice.
 Chunk Six remains active for Windows packaging, desktop app packaging format,
@@ -661,6 +663,13 @@ sole reason to inject text.
 | 2026-06-29T22:05:13-06:00 | `npm run vscode:package` | pass | Final VSIX contains 10 files, 13.54 KB, with no Graphify cache, desktop build output, or node modules. |
 | 2026-06-29T22:07:04-06:00 | `git diff --check` | pass | No whitespace errors in the final diff. |
 | 2026-06-29T22:07:04-06:00 | `graphify update . --no-cluster` | pass | Repo graph refresh completed without clustering; 726 nodes and 9029 edges. |
+| 2026-06-29T22:14:04-06:00 | `bash scripts/governance-preflight.sh` | pass | Operator-guide polish passed preflight with 0 warnings. |
+| 2026-06-29T22:17:36-06:00 | `npm run lint` | pass | ESLint passed for source, tests, and Vite config. |
+| 2026-06-29T22:17:36-06:00 | `npm run build` | pass | TypeScript compile and desktop renderer production build passed. |
+| 2026-06-29T22:17:36-06:00 | `npm test` | pass | 21 unit tests passed. |
+| 2026-06-29T22:17:36-06:00 | `npm run desktop:smoke` | pass | Electron smoke opened the operator-guide drawer and confirmed `Operator Guide` content; headless DBus warnings only. |
+| 2026-06-29T22:18:35-06:00 | `git diff --check` | pass | No whitespace errors in the final diff. |
+| 2026-06-29T22:18:35-06:00 | `graphify update . --no-cluster` | pass | Repo graph refresh completed without clustering; 728 nodes and 10075 edges. |
 
 ## Next Handoff
 
@@ -669,6 +678,6 @@ desktop app package format, fresh-platform evidence, and final uninstall notes.
 The VS Code companion extension is installed in Adam's normal VS Code profile,
 and the live bridge detected four VS Code windows after install. Existing
 unmanaged terminals are correctly shown as candidate cards and remain unarmable.
-The desktop launcher was refreshed at
-`/home/adamgoodwin/Desktop/Perpetual Context Protection.desktop` with the named
-infinity icon.
+The desktop app now includes an operator-guide drawer for in-app instructions.
+The desktop launcher was refreshed at `/home/adamgoodwin/Desktop/Perpetual
+Context Protection.desktop` with the named infinity icon.

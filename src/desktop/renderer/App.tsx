@@ -1,11 +1,13 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
-import type { ReactElement } from "react";
+import type { ReactElement, ReactNode } from "react";
 import {
   Activity,
   Ban,
+  BookOpen,
   Circle,
   InfinityIcon,
   Pause,
+  PanelRightOpen,
   Play,
   Radio,
   RefreshCw,
@@ -34,6 +36,7 @@ export function App(): ReactElement {
   const [state, setState] = useState<DesktopStateResponse | undefined>();
   const [activePane, setActivePane] = useState<ActivePane>("sessions");
   const [isRefreshing, setIsRefreshing] = useState(false);
+  const [isGuideOpen, setIsGuideOpen] = useState(false);
   const [actionCardId, setActionCardId] = useState<string | undefined>();
   const [error, setError] = useState<string | undefined>();
 
@@ -56,6 +59,21 @@ export function App(): ReactElement {
     }, 2500);
     return () => window.clearInterval(interval);
   }, [refresh]);
+
+  useEffect(() => {
+    if (!isGuideOpen) {
+      return undefined;
+    }
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        setIsGuideOpen(false);
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [isGuideOpen]);
 
   const runAction = useCallback(
     async (
@@ -111,6 +129,17 @@ export function App(): ReactElement {
         </nav>
 
         <div className="topbar-actions">
+          <button
+            className="icon-button"
+            type="button"
+            title="Operator guide"
+            aria-label="Open operator guide"
+            aria-controls="operator-guide"
+            aria-expanded={isGuideOpen}
+            onClick={() => setIsGuideOpen(true)}
+          >
+            <BookOpen size={18} />
+          </button>
           <AutomationModeControl
             mode={state?.automation.mode ?? "dry-run"}
             disabled={actionCardId === "automation-mode"}
@@ -195,6 +224,21 @@ export function App(): ReactElement {
           <EventLog events={state?.events ?? []} />
         </aside>
       </main>
+
+      {isGuideOpen ? (
+        <>
+          <button
+            className="drawer-backdrop"
+            type="button"
+            aria-label="Close operator guide"
+            onClick={() => setIsGuideOpen(false)}
+          />
+          <OperatorGuideDrawer
+            state={state}
+            onClose={() => setIsGuideOpen(false)}
+          />
+        </>
+      ) : null}
     </div>
   );
 }
@@ -475,6 +519,121 @@ function SettingsPane(props: {
         />
       </div>
     </div>
+  );
+}
+
+function OperatorGuideDrawer(props: {
+  state: DesktopStateResponse | undefined;
+  onClose: () => void;
+}): ReactElement {
+  const extension = props.state?.setup?.vscodeExtension;
+  const bridgeOnline = props.state?.connection.bridgeOnline ?? false;
+  const windowCount = props.state?.connection.heartbeatCount ?? 0;
+  const sessionCount = props.state?.connection.sessionCount ?? 0;
+  const setupStatus = !bridgeOnline
+    ? "Bridge offline"
+    : extension?.installed
+      ? `${windowCount} VS Code windows, ${sessionCount} managed sessions`
+      : "VS Code companion missing";
+
+  return (
+    <aside
+      className="instruction-drawer"
+      id="operator-guide"
+      role="dialog"
+      aria-label="Operator guide"
+      aria-modal="false"
+    >
+      <div className="drawer-header">
+        <div>
+          <p className="drawer-kicker">Instructions</p>
+          <h2>Operator Guide</h2>
+          <p>{setupStatus}</p>
+        </div>
+        <button
+          className="icon-button"
+          type="button"
+          title="Close"
+          aria-label="Close operator guide"
+          onClick={props.onClose}
+        >
+          <X size={18} />
+        </button>
+      </div>
+
+      <div className="guide-callout">
+        <PanelRightOpen size={19} />
+        <div>
+          <strong>Detected cards are not all automation targets.</strong>
+          <p>
+            A current Codex or Claude terminal can appear as a candidate card
+            when VS Code can see it but the companion did not start it. Candidate
+            and unsupported cards stay unarmable by design.
+          </p>
+        </div>
+      </div>
+
+      <div className="guide-steps">
+        <GuideStep
+          index={1}
+          title="Confirm the companion is connected"
+          body={
+            extension?.installed
+              ? extension.reloadHint
+              : `Run ${extension?.installCommand ?? "npm run vscode:install"}, then reload VS Code.`
+          }
+        />
+        <GuideStep
+          index={2}
+          title="Start managed work from VS Code"
+          body="Open the Command Palette and run the managed Claude or Codex command from the companion extension."
+        >
+          <ul className="guide-command-list">
+            <li>
+              <code>Perpetual Context Protection: Start Managed Codex Session</code>
+            </li>
+            <li>
+              <code>Perpetual Context Protection: Start Managed Claude Session</code>
+            </li>
+          </ul>
+        </GuideStep>
+        <GuideStep
+          index={3}
+          title="Use Dry Run before Live"
+          body="Dry Run logs the compact and resume decision without sending text. Live sends only to armed managed sessions."
+        />
+        <GuideStep
+          index={4}
+          title="Arm only what should continue"
+          body="Arm enables monitoring for one managed session. Arm All affects only eligible managed cards and leaves candidate cards alone."
+        />
+        <GuideStep
+          index={5}
+          title="Watch the stop states"
+          body="Complete, blocked, needs-human, uncertain, and error states stop automation instead of looping."
+        />
+      </div>
+    </aside>
+  );
+}
+
+function GuideStep(props: {
+  index: number;
+  title: string;
+  body: string;
+  children?: ReactNode;
+}): ReactElement {
+  return (
+    <section className="guide-step">
+      <span className="guide-step-index" aria-hidden="true">
+        {props.index}
+      </span>
+      <div>
+        <h3>{props.title}</h3>
+        <p>{props.body}</p>
+        {props.children}
+      </div>
+    </section>
   );
 }
 

@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- 2026-06-29: Added a desktop operator-guide drawer for Chunk Six polish. The
+  drawer explains candidate versus managed cards, companion setup, managed
+  Claude/Codex launch commands, dry-run/live mode, arm behavior, and stop
+  states; desktop smoke now opens the drawer and verifies the guide content.
 - 2026-06-29: Added Chunk Six Linux companion setup proof. The VS Code
   companion can now be packaged and installed with `npm run vscode:package` and
   `npm run vscode:install`; the desktop state reports companion setup status,

@@ -120,18 +120,33 @@ async function verifyDesktopSmoke(window: BrowserWindow | undefined): Promise<vo
     const result = (await window.webContents.executeJavaScript(
       `(() => {
         const shell = document.querySelector(".app-shell");
+        const guideButton = document.querySelector('[aria-label="Open operator guide"]');
+        const guide = document.querySelector("#operator-guide");
+        if (guideButton && !guide) {
+          guideButton.click();
+        }
         return {
           hasShell: Boolean(shell),
+          hasGuideButton: Boolean(guideButton),
+          hasGuide: Boolean(document.querySelector("#operator-guide")),
           bodyText: document.body?.innerText ?? ""
         };
       })()`,
       true
-    )) as { hasShell: boolean; bodyText: string };
+    )) as {
+      hasShell: boolean;
+      hasGuideButton: boolean;
+      hasGuide: boolean;
+      bodyText: string;
+    };
 
     lastBodyText = result.bodyText;
     if (
       result.hasShell &&
-      result.bodyText.includes("Perpetual Context Protection")
+      result.hasGuideButton &&
+      result.hasGuide &&
+      result.bodyText.includes("Perpetual Context Protection") &&
+      result.bodyText.includes("Operator Guide")
     ) {
       process.exitCode = 0;
       app.quit();
