@@ -1,7 +1,7 @@
 # Current Build Pathway
 
-Last Updated: 2026-06-29T22:17:36-06:00
-Status: Chunk Six operator-guide polish complete - Windows packaging pending
+Last Updated: 2026-06-29T22:30:16-06:00
+Status: Night closeout complete - Adam-observed live testing next
 Owner: Technical Lead
 
 > **Single active pathway document.** This is the live path from planning to a
@@ -67,7 +67,7 @@ human decision.
 | Chunk Three - Agent profiles and signal detector | done | 2026-06-29T20:11:30-06:00 | build agent | Claude/Codex profiles, multi-signal boundary detection |
 | Chunk Four - One managed compact cycle | done | 2026-06-29T21:36:33-06:00 | build agent | Watched managed Codex dry-run/live compact cycle passed; compact and resume evidence recorded |
 | Chunk Five - Multi-session arm/pause/all control | done | 2026-06-29T21:50:34-06:00 | build agent | Watched two-session Codex dry-run/live pass completed; pause isolation, Arm All safety, and kill cleanup verified |
-| Chunk Six - Windows/Linux packaging | active | 2026-06-29T22:05:13-06:00 | build agent | Linux VS Code companion install proof passed; Windows packaging remains |
+| Chunk Six - Windows/Linux packaging | active | 2026-06-29T22:30:16-06:00 | build agent | Linux companion/app proof of life passed; next session begins with Adam-observed live testing before Windows packaging |
 | Chunk Seven - Public release hardening | pending | - | build agent | Docs, examples, security notes, GitHub release path |
 
 ## Chunk Zero - Repo And Public Project Setup
@@ -531,10 +531,12 @@ Implementation evidence:
 - 2026-06-29T22:05:13-06:00: Refreshed the Linux launcher install path so the infinity icon is installed into the user icon theme as `perpetual-context-protection`.
 - 2026-06-29T22:17:36-06:00: Added a desktop operator-guide drawer that explains candidate versus managed cards, companion setup, managed Claude/Codex launch commands, dry-run/live mode, arm behavior, and automation stop states.
 - 2026-06-29T22:17:36-06:00: Extended desktop smoke validation so it opens the operator-guide drawer and requires the `Operator Guide` content before passing.
+- 2026-06-29T22:30:16-06:00: Night closeout handoff recorded. Adam has seen proof of life in the desktop app; next work starts with Adam-observed live testing, including dry-run first, then live mode only against a clearly managed and armable disposable session.
 
 Close-out state: Task complete for the Linux companion install/setup slice.
-Chunk Six remains active for Windows packaging, desktop app packaging format,
-fresh-platform smoke evidence, and final uninstall documentation.
+Chunk Six remains active for live testing, Windows packaging, desktop app
+packaging format, fresh-platform smoke evidence, and final uninstall
+documentation.
 
 ---
 
@@ -673,11 +675,17 @@ sole reason to inject text.
 
 ## Next Handoff
 
-Continue with the remaining Chunk Six packaging work: Windows install/smoke,
-desktop app package format, fresh-platform evidence, and final uninstall notes.
-The VS Code companion extension is installed in Adam's normal VS Code profile,
-and the live bridge detected four VS Code windows after install. Existing
-unmanaged terminals are correctly shown as candidate cards and remain unarmable.
-The desktop app now includes an operator-guide drawer for in-app instructions.
-The desktop launcher was refreshed at `/home/adamgoodwin/Desktop/Perpetual
-Context Protection.desktop` with the named infinity icon.
+Start with Adam-observed live testing before additional packaging work. Launch
+the desktop app from `/home/adamgoodwin/Desktop/Perpetual Context
+Protection.desktop`, confirm the operator-guide drawer is visible, start a
+disposable managed Codex or Claude session from VS Code using the companion
+command, run dry-run first, then switch to live mode only after the target card
+is clearly managed and armable. Record the live-test evidence in this document.
+
+After live testing, continue with the remaining Chunk Six packaging work:
+Windows install/smoke, desktop app package format, fresh-platform evidence, and
+final uninstall notes. The VS Code companion extension is installed in Adam's
+normal VS Code profile, and the live bridge detected four VS Code windows after
+install. Existing unmanaged terminals are correctly shown as candidate cards and
+remain unarmable. The desktop app includes an operator-guide drawer for in-app
+instructions. The desktop launcher uses the named infinity icon.

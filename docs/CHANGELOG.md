@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- 2026-06-29: Recorded the night closeout handoff for Chunk Six. The next
+  session starts with Adam-observed live testing of a disposable managed
+  Codex/Claude session before continuing Windows packaging or desktop package
+  format work.
 - 2026-06-29: Added a desktop operator-guide drawer for Chunk Six polish. The
   drawer explains candidate versus managed cards, companion setup, managed
   Claude/Codex launch commands, dry-run/live mode, arm behavior, and stop

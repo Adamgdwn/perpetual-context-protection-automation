@@ -1,7 +1,7 @@
 # Start Here
 
-Last Updated: 2026-06-29T22:05:13-06:00
-Status: Chunk Six Linux companion setup proof complete - Windows packaging pending
+Last Updated: 2026-06-29T22:30:16-06:00
+Status: Night closeout complete - next session starts with Adam-observed live testing
 Owner: Adam Goodwin
 
 ## 2026-06-29 Chunk Zero Completion Handoff
@@ -20,7 +20,7 @@ Resume rule for the next implementation session:
 2. Run `git status --short`.
 3. Read this file and `docs/current-build-pathway.md`.
 4. Do not restart from the superseded tmux/n8n plan in `PLAN.md`.
-5. Continue with Chunk Six Windows/Linux packaging.
+5. Start with Adam-observed live testing before more packaging work.
 
 Most important product decision:
 
@@ -113,6 +113,9 @@ and architecture plan. `PLAN.md` is retained as superseded tmux/n8n research.
 
 Current priorities:
 
+- **Start next with live testing** - Adam has launched the app and sees proof of
+  life; the next session should capture an Adam-observed live testing update
+  before continuing packaging or polish
 - **Package the app for real use** - Linux VS Code companion packaging/install proof passed; continue with Windows packaging, desktop app package format, and fresh-platform smoke evidence
 - Build VS Code-first, coder-agnostic behavior before optional tmux or n8n adapters
 - Treat terminal observability as explicit session metadata: managed, adoptable, candidate, or unsupported
@@ -156,6 +159,21 @@ Risk-triggering work includes production, deployment, authentication, authorizat
 ## Agent Handoff
 
 Update this file only when the top-level plan or handoff point changes. Put detailed step-by-step progress in the active plan named above.
+
+## 2026-06-29 Night Closeout - Live Testing Next
+
+Tonight's build reached a strong proof-of-life state on Linux: the desktop app
+launches, detects VS Code companion heartbeats, shows candidate/current-session
+cards safely, includes an operator-guide drawer, and has automated smoke tests
+through the guide drawer.
+
+When this file is opened next, begin with live testing while Adam watches:
+launch the desktop app from the launcher, confirm the operator guide is visible,
+start a disposable managed Codex or Claude session from VS Code using the
+companion command, run dry-run first, then live mode only after the target card
+is clearly managed and armable. Record the live-test evidence in
+`docs/current-build-pathway.md` before moving on to Windows packaging or final
+desktop package format decisions.
 
 After compaction or a context clear, restart from the latest handoff/work packet,
 then run `git status --short`, read the short repo-local instructions, and open
