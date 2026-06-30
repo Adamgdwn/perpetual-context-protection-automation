@@ -5,7 +5,6 @@ import {
   Ban,
   BookOpen,
   Circle,
-  InfinityIcon,
   Pause,
   PanelRightOpen,
   Play,
@@ -27,6 +26,7 @@ import type {
   SessionAutomationMode,
   SessionCardStatus
 } from "../../shared/protocol";
+import guidedAiLabsMarkUrl from "../../../assets/guided-ai-labs-signal-spark-mark.svg";
 
 type ActivePane = "sessions" | "settings";
 
@@ -101,11 +101,15 @@ export function App(): ReactElement {
       <header className="topbar">
         <div className="brand-block">
           <div className="brand-mark" aria-hidden="true">
-            <InfinityIcon size={23} />
+            <img src={guidedAiLabsMarkUrl} alt="" />
           </div>
           <div>
             <h1>Perpetual Context Protection</h1>
-            <p>{state ? formatGeneratedAt(state.generatedAt) : "Bridge state pending"}</p>
+            <p className="brand-subtitle">
+              <span>by Guided AI Labs</span>
+              <span aria-hidden="true">/</span>
+              <span>{state ? formatGeneratedAt(state.generatedAt) : "Bridge state pending"}</span>
+            </p>
           </div>
         </div>
 
