@@ -1,7 +1,7 @@
 # Current Build Pathway
 
-Last Updated: 2026-06-29T22:30:16-06:00
-Status: Night closeout complete - Adam-observed live testing next
+Last Updated: 2026-06-30T10:32:05-06:00
+Status: Documentation closeout complete - paused before live testing and Windows packaging
 Owner: Technical Lead
 
 > **Single active pathway document.** This is the live path from planning to a
@@ -67,8 +67,8 @@ human decision.
 | Chunk Three - Agent profiles and signal detector | done | 2026-06-29T20:11:30-06:00 | build agent | Claude/Codex profiles, multi-signal boundary detection |
 | Chunk Four - One managed compact cycle | done | 2026-06-29T21:36:33-06:00 | build agent | Watched managed Codex dry-run/live compact cycle passed; compact and resume evidence recorded |
 | Chunk Five - Multi-session arm/pause/all control | done | 2026-06-29T21:50:34-06:00 | build agent | Watched two-session Codex dry-run/live pass completed; pause isolation, Arm All safety, and kill cleanup verified |
-| Chunk Six - Windows/Linux packaging | active | 2026-06-29T22:30:16-06:00 | build agent | Linux companion/app proof of life passed; next session begins with Adam-observed live testing before Windows packaging |
-| Chunk Seven - Public release hardening | pending | - | build agent | Docs, examples, security notes, GitHub release path |
+| Chunk Six - Windows/Linux packaging | paused | 2026-06-30T10:32:05-06:00 | build agent | Linux companion/app proof of life passed; branding and docs closeout done; next session begins with Adam-observed live testing before Windows packaging |
+| Chunk Seven - Public release hardening | partial | 2026-06-30T10:32:05-06:00 | build agent | Public README/screenshots, manual, runbook, risks, changelog, and roadmap refreshed; issue templates and release draft pending |
 
 ## Chunk Zero - Repo And Public Project Setup
 
@@ -506,9 +506,9 @@ Acceptance criteria:
 - [ ] Fresh Linux install can launch desktop app and connect to VS Code extension
 - [ ] Fresh Windows install can launch desktop app and connect to VS Code extension
 - [x] App can locate or guide installation of the VS Code extension
-- [ ] App handles no VS Code windows, no extension, no sessions, and bridge disconnected states
+- [x] App handles no VS Code windows, no extension, no sessions, and bridge disconnected states
 - [ ] Release artifacts do not include secrets
-- [ ] Rollback/uninstall path is documented
+- [x] Rollback/uninstall path is documented
 
 Validation:
 
@@ -532,17 +532,19 @@ Implementation evidence:
 - 2026-06-29T22:17:36-06:00: Added a desktop operator-guide drawer that explains candidate versus managed cards, companion setup, managed Claude/Codex launch commands, dry-run/live mode, arm behavior, and automation stop states.
 - 2026-06-29T22:17:36-06:00: Extended desktop smoke validation so it opens the operator-guide drawer and requires the `Operator Guide` content before passing.
 - 2026-06-29T22:30:16-06:00: Night closeout handoff recorded. Adam has seen proof of life in the desktop app; next work starts with Adam-observed live testing, including dry-run first, then live mode only against a clearly managed and armable disposable session.
+- 2026-06-30T10:32:05-06:00: Applied Guided AI Labs desktop branding, added the Signal Spark mark to the desktop header, refreshed the public GitHub README with screenshots and use instructions, and updated the living docs plus 01 Work Tracking ledger for a clean pause point.
+- 2026-06-30T10:32:05-06:00: Validation for the branded/docs pass included `npm run compile`, `npm run lint`, `npm run build`, `npm run desktop:smoke`, `npm test`, `git diff --check`, and a Markdown render check.
 
-Close-out state: Task complete for the Linux companion install/setup slice.
-Chunk Six remains active for live testing, Windows packaging, desktop app
-packaging format, fresh-platform smoke evidence, and final uninstall
-documentation.
+Close-out state: Task complete for the Linux companion install/setup and public
+documentation prep slices. Chunk Six is paused, not release ready. It remains
+active for Adam-observed live testing, Windows packaging, desktop app packaging
+format, fresh-platform smoke evidence, and final release review.
 
 ---
 
 ## Chunk Seven - Public Release Hardening
 
-Status: planned
+Status: partial
 
 Completion target: Release ready
 
@@ -571,12 +573,12 @@ Outputs:
 
 Acceptance criteria:
 
-- [ ] README explains what the app does, what it will not do, and how to install it
-- [ ] Manual explains session cards, observability levels, arm/pause/all controls, and terminal states
-- [ ] Runbook covers disconnected bridge, false boundary, stuck compact, blocked session, and unsafe output
-- [ ] Risk register includes command-injection, false-positive, runaway-loop, and unsupported-terminal risks
+- [x] README explains what the app does, what it will not do, and how to install it
+- [x] Manual explains session cards, observability levels, arm/pause/all controls, and terminal states
+- [x] Runbook covers disconnected bridge, false boundary, stuck compact, blocked session, and unsafe output
+- [x] Risk register includes command-injection, false-positive, runaway-loop, and unsupported-terminal risks
 - [ ] GitHub issue templates or contribution notes exist
-- [ ] Release notes state known limitations honestly
+- [x] Release notes state known limitations honestly
 
 Validation:
 
@@ -589,6 +591,21 @@ npm run build
 
 Stop condition: Stop if the app is not yet safe enough to publish with honest
 limitations.
+
+Evidence:
+
+- 2026-06-30T10:32:05-06:00: Public GitHub README now has Guided AI Labs
+  branding, three screenshots, current use instructions, validation notes, and
+  known limits.
+- 2026-06-30T10:32:05-06:00: Manual, runbook, deployment guide, roadmap,
+  architecture note, domain language, risk register, changelog, START_HERE, and
+  CARRY_FORWARD were refreshed for the current pause point.
+- 2026-06-30T10:32:05-06:00: Remaining release-hardening work is GitHub issue
+  or contribution templates, release draft, packaging evidence, and final
+  release review after live testing/Windows packaging.
+
+Close-out state: Draft complete for public documentation prep. Not release
+ready.
 
 ## Signal Strategy
 

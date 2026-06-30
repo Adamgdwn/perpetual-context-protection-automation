@@ -1,6 +1,26 @@
 # Deployment Guide
 
-Last updated: 2026-06-29T22:05:13-06:00
+Last updated: 2026-06-30T10:32:05-06:00
+
+## Current Release Posture
+
+This project is paused at a branded local proof and documentation closeout. It
+is not release ready yet.
+
+Completed so far:
+
+- Linux desktop launch proof.
+- VS Code companion package/install proof.
+- Public GitHub README with screenshots and current usage instructions.
+- Rollback commands documented for the local Linux setup.
+
+Still required before release:
+
+- Adam-observed dry-run/live testing on a disposable managed session.
+- Windows packaging and smoke evidence.
+- Desktop package format decision.
+- Secret/release artifact review.
+- GitHub release draft and final release review.
 
 ## Environments
 
@@ -66,3 +86,4 @@ rm -f "$HOME/.local/share/icons/hicolor/scalable/apps/perpetual-context-protecti
 - Dry-run boundary detection logs a decision.
 - Live compact/resume works on a disposable test session.
 - Candidate/unsupported sessions cannot be armed unattended.
+- Public docs state current limitations honestly.

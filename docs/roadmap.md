@@ -1,34 +1,45 @@
 # Roadmap
 
-Last Updated: 2026-06-29T18:37:53-06:00
+Last Updated: 2026-06-30T10:32:05-06:00
 
-## Now - Milestone 0: Repo And Product Alignment
+## Now - Milestone 3.5: Pause Point And Live Testing
 
-- Correct public repo name to `perpetual-context-protection-automation`
-- Initialize local Git and create public GitHub repo under Adam's account
-- Keep the old tmux/n8n plan as superseded research
-- Use the VS Code-first build pathway as the active plan
+- Public repo and local path are aligned at `perpetual-context-protection-automation`.
+- Guided AI Labs branding and the public GitHub README/screenshots are in place.
+- Living docs and 01 Work Tracking are updated for a clean pause.
+- Next implementation work starts with Adam-observed dry-run/live testing on a
+  disposable managed Codex or Claude session.
 
-## Next - Milestone 1: VS Code Integration Proof
+## Completed - Milestone 1: VS Code Integration Proof
 
-- Scaffold desktop app and VS Code extension workspaces
-- Prove extension-to-desktop heartbeat
-- Prove at least one reliable terminal read/write path for Claude or Codex
-- Show detected VS Code windows and session cards in the desktop app
+- Scaffolded desktop app and VS Code extension workspaces.
+- Proved extension-to-desktop heartbeat.
+- Proved bridge-owned managed PTY read/write path for Linux.
+- Showed detected VS Code windows and session cards in the desktop app.
 
-## Then - Milestone 2: One Safe Loop
+## Completed - Milestone 2: One Safe Loop
 
-- Implement session state machine and logs
-- Add Claude and Codex profiles
-- Implement dry-run detection for one managed session
-- Send compact/resume only after boundary and idle signals agree
+- Implemented session state machine and logs.
+- Added Claude and Codex profiles.
+- Implemented dry-run detection for one managed session.
+- Sent compact/resume only after boundary and idle signals agreed in watched
+  Codex live-cycle evidence.
 
-## After - Milestone 3: Multi-Session Control
+## Completed - Milestone 3: Multi-Session Control
 
-- Arm one session or all eligible managed sessions
-- Per-session pause, kill, reset, and complete/blocked states
-- Windows and Linux validation
-- Installer packaging for both platforms
+- Arm one session or all eligible managed sessions.
+- Per-session pause, kill, reset, and complete/blocked states.
+- Workspace-grouped session cards, event log, settings, and operator guide.
+- Candidate/unsupported sessions remain visible but unarmable.
+
+## Next - Milestone 4: Packaging And Release Evidence
+
+- Adam-observed dry-run/live testing on a disposable managed session.
+- Windows validation and packaging.
+- Desktop package format decision.
+- Fresh-platform smoke evidence.
+- GitHub issue/contribution templates and release draft.
+- Release review only after limitations and rollback evidence are current.
 
 ## Later
 

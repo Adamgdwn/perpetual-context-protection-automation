@@ -1,7 +1,7 @@
 # Start Here
 
-Last Updated: 2026-06-29T22:30:16-06:00
-Status: Night closeout complete - next session starts with Adam-observed live testing
+Last Updated: 2026-06-30T10:32:05-06:00
+Status: Documentation closeout complete - paused before live testing and Windows packaging
 Owner: Adam Goodwin
 
 ## 2026-06-29 Chunk Zero Completion Handoff
@@ -113,10 +113,17 @@ and architecture plan. `PLAN.md` is retained as superseded tmux/n8n research.
 
 Current priorities:
 
-- **Start next with live testing** - Adam has launched the app and sees proof of
-  life; the next session should capture an Adam-observed live testing update
-  before continuing packaging or polish
-- **Package the app for real use** - Linux VS Code companion packaging/install proof passed; continue with Windows packaging, desktop app package format, and fresh-platform smoke evidence
+- **Resume with live testing** - Adam has launched the app and seen proof of
+  life; the next implementation session should capture Adam-observed dry-run
+  and live evidence on a disposable managed Codex or Claude session before
+  continuing packaging or polish.
+- **Package the app for real use** - Linux VS Code companion packaging/install
+  proof passed; continue with Windows packaging, desktop app package format,
+  and fresh-platform smoke evidence.
+- **Keep public docs honest** - The public GitHub README now has Guided AI Labs
+  branding, screenshots, current use instructions, and known limits. Do not
+  call the project release ready until the remaining packaging/release evidence
+  exists.
 - Build VS Code-first, coder-agnostic behavior before optional tmux or n8n adapters
 - Treat terminal observability as explicit session metadata: managed, adoptable, candidate, or unsupported
 - Use multi-signal pause detection, not a single required `===CHUNK_DONE===` phrase
@@ -160,18 +167,18 @@ Risk-triggering work includes production, deployment, authentication, authorizat
 
 Update this file only when the top-level plan or handoff point changes. Put detailed step-by-step progress in the active plan named above.
 
-## 2026-06-29 Night Closeout - Live Testing Next
+## 2026-06-30 Documentation Closeout - Paused
 
-Tonight's build reached a strong proof-of-life state on Linux: the desktop app
-launches, detects VS Code companion heartbeats, shows candidate/current-session
-cards safely, includes an operator-guide drawer, and has automated smoke tests
-through the guide drawer.
+The current pause point is clean and recoverable. The desktop app has Guided AI
+Labs branding in the header, the Signal Spark mark, a public GitHub README with
+three screenshots, and refreshed living docs for current use, deployment,
+operation, roadmap, risks, and status.
 
-When this file is opened next, begin with live testing while Adam watches:
-launch the desktop app from the launcher, confirm the operator guide is visible,
-start a disposable managed Codex or Claude session from VS Code using the
-companion command, run dry-run first, then live mode only after the target card
-is clearly managed and armable. Record the live-test evidence in
+When this file is opened next for implementation, begin with live testing while
+Adam watches: launch the desktop app from the launcher, confirm the operator
+guide is visible, start a disposable managed Codex or Claude session from VS
+Code using the companion command, run dry-run first, then live mode only after
+the target card is clearly managed and armable. Record the live-test evidence in
 `docs/current-build-pathway.md` before moving on to Windows packaging or final
 desktop package format decisions.
 

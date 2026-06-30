@@ -3,6 +3,7 @@
 Document type: shared vocabulary
 Audience: project owner, builders, AI coding agents, reviewers, and operators
 Purpose: define the terms used consistently across code, docs, tests, UI, prompts, runbooks, and release notes.
+Last updated: 2026-06-30T10:32:05-06:00
 
 ## Purpose
 
@@ -24,6 +25,10 @@ When a term changes, update this file and the affected code or documentation in 
 | Candidate session | A detected VS Code terminal or window that may be relevant but is not yet safe to automate. | unknown window | Shown to operator, not armed by default. |
 | Observability level | The declared reliability of read/write control for a session: managed, adoptable, candidate, or unsupported. | confidence | Determines whether `Arm` is allowed. |
 | Agent profile | A configuration for one coder CLI: launch command, compact command, resume text, signals, and idle rules. | bot config | Claude, Codex, future agents. |
+| Guided AI Labs brand treatment | The product-shell branding that shows the Signal Spark mark and "by Guided AI Labs" in the desktop header and public README. | rename, rebrand everything | Visual identity layer; command ids and product name still use Perpetual Context Protection. |
+| Operator guide | The desktop drawer that summarizes setup, managed-session launch commands, dry-run/live behavior, arming rules, and stop states. | help modal only | First-run/operator reference surface. |
+| Dry Run | Automation mode that records compact/resume decisions without sending text to a coder session. | test mode | Default first observed cycle. |
+| Live | Automation mode that sends compact/resume text only to armed managed sessions. | automatic mode | Use only after dry-run evidence and operator readiness. |
 | Boundary signal | Evidence that a coder session has finished a useful chunk and may be compacted. | done text | Pause detector input. |
 | Completion signal | Evidence that the overall task has no more chunks and automation should stop. | final done | State machine terminal condition. |
 | Blocked signal | Evidence that the coder needs a human decision, access, clarification, or intervention. | error text | State machine terminal condition. |

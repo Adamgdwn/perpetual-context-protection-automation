@@ -1,12 +1,17 @@
 # Runbook
 
-Last updated: 2026-06-29T22:05:13-06:00
+Last updated: 2026-06-30T10:32:05-06:00
 
 ## Purpose
 
 In operation, the desktop app receives VS Code extension heartbeats, shows
 session cards, watches armed managed coder sessions, and performs compact/resume
 cycles only when detector and idle evidence agree.
+
+Current status: documentation closeout is complete and the project is paused
+before Adam-observed live testing and Windows packaging. The desktop shell uses
+Guided AI Labs branding in the header; the launcher/product name remains
+Perpetual Context Protection.
 
 ## Alerts And Failures
 
@@ -22,6 +27,9 @@ cycles only when detector and idle evidence agree.
   detector rules.
 - Blocked or needs-human: read the session card log and resolve the underlying
   agent request manually.
+- Unsafe output or unexpected command send: pause all managed cards, preserve the
+  event log/transcript, and continue manually until the detector or profile is
+  corrected.
 
 ## Dependencies
 
@@ -42,6 +50,9 @@ cycles only when detector and idle evidence agree.
   it opens blank, run `npm run desktop:smoke` before live testing.
 - Keep automation mode on `Dry Run` for the first observed cycle. Switch to
   `Live` only when Adam is watching and ready to pause.
+- For the next implementation session, use a disposable managed Codex or Claude
+  session and record the dry-run/live evidence in
+  `docs/current-build-pathway.md`.
 
 ## Recovery
 

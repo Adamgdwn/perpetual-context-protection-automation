@@ -1,6 +1,6 @@
 # Architecture Overview
 
-Last Updated: 2026-06-29T20:44:55-06:00
+Last Updated: 2026-06-30T10:32:05-06:00
 
 ## Summary
 
@@ -12,6 +12,11 @@ VS Code extension is the window/session integration layer that reports detected
 VS Code workspaces and observable coder terminals, streams terminal output where
 the API path supports it, and sends compact/resume commands when the desktop app
 arms a session.
+
+The current desktop shell is branded "by Guided AI Labs" with the Signal Spark
+mark in the header. This is a product-shell treatment only; the app, command
+ids, local bridge, and VS Code extension still use Perpetual Context Protection
+naming.
 
 tmux and n8n are optional future adapters, not the v1 foundation.
 

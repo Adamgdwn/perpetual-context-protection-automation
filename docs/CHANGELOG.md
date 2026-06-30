@@ -2,6 +2,17 @@
 
 ## Unreleased
 
+- 2026-06-30: Closed the current documentation chunk as paused, not release
+  ready. `START_HERE.md`, `docs/current-build-pathway.md`, README, manual,
+  runbook, deployment guide, roadmap, architecture note, domain language, risk
+  register, `CARRY_FORWARD.md`, and the 01 Work Tracking ledger now point to
+  the same next step: Adam-observed live testing before Windows packaging.
+- 2026-06-30: Updated the public GitHub landing page with Guided AI Labs
+  branding, three desktop screenshots, current use instructions, validation
+  notes, and known limitations.
+- 2026-06-30: Applied Guided AI Labs desktop branding. The desktop header now
+  uses the Signal Spark mark and "by Guided AI Labs" treatment, with a refreshed
+  light operator color system.
 - 2026-06-29: Recorded the night closeout handoff for Chunk Six. The next
   session starts with Adam-observed live testing of a disposable managed
   Codex/Claude session before continuing Windows packaging or desktop package

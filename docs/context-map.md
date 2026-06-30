@@ -35,6 +35,7 @@ Keep these files compact. They should route to durable docs, not duplicate them.
 | Architecture decisions or system shape | `docs/architecture.md` and relevant ADRs |
 | Domain terms or naming | `docs/domain-language.md` |
 | Deployment, release, rollback, or environment changes | `docs/deployment-guide.md`, `docs/runbook.md`, and release standards |
+| Public GitHub landing page, screenshots, or current-use instructions | `README.md`, `docs/assets/`, `docs/manual.md`, and `docs/deployment-guide.md` |
 | Agent autonomy, tools, prompts, models, or permissions | `docs/agent-inventory.md`, `docs/model-registry.md`, `docs/prompt-register.md`, and `docs/tool-permission-matrix.md` |
 
 ## Search Before Loading
