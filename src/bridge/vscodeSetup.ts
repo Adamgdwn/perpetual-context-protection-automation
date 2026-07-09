@@ -5,7 +5,7 @@ import type { DesktopSetupSummary } from "../shared/protocol";
 
 const EXTENSION_ID = "adamgoodwin.perpetual-context-protection-automation";
 const EXTENSION_NAME = "perpetual-context-protection-automation";
-const EXTENSION_VERSION = "0.0.1";
+const EXTENSION_VERSION = "0.0.2";
 
 export function createDesktopSetupSummary(): DesktopSetupSummary {
   const checkedLocations = candidateExtensionDirectories();

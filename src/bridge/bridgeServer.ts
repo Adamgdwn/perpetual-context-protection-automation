@@ -198,6 +198,21 @@ async function handleRequest(
       return;
     }
 
+    const sessionByIdMatch = url.pathname.match(/^\/sessions\/([^/]+)$/u);
+    if (request.method === "DELETE" && sessionByIdMatch) {
+      const session = state.sessions.get(sessionByIdMatch[1]);
+      if (!session) {
+        sendJson(response, 404, { ok: false, error: "Session not found" });
+        return;
+      }
+      const summary = session.summary();
+      session.stop();
+      state.sessions.delete(sessionByIdMatch[1]);
+      state.desktop.recordSessionStopped(summary, "terminal");
+      sendJson(response, 200, { ok: true });
+      return;
+    }
+
     const outputMatch = url.pathname.match(/^\/sessions\/([^/]+)\/output$/u);
     if (request.method === "GET" && outputMatch) {
       const session = state.sessions.get(outputMatch[1]);
@@ -334,7 +349,7 @@ function sendEmpty(response: ServerResponse, statusCode: number): void {
 function bridgeResponseHeaders(response: ServerResponse): Record<string, string> {
   const headers: Record<string, string> = {
     "cache-control": "no-store",
-    "access-control-allow-methods": "GET, POST, OPTIONS",
+    "access-control-allow-methods": "GET, POST, DELETE, OPTIONS",
     "access-control-allow-headers": "content-type"
   };
   const origin = response.req.headers.origin;

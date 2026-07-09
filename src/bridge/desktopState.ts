@@ -78,6 +78,20 @@ export class DesktopStateStore {
     });
   }
 
+  public recordSessionStopped(session: BridgeSessionSummary, reason: string): void {
+    // The session is being removed from the bridge, so clear any automation
+    // state tied to its card and leave an audit line in the append-only log.
+    this.automation.resetCard(managedCardId(session.id));
+    this.appendEvent({
+      kind: "session-killed",
+      cardId: managedCardId(session.id),
+      workspaceId: session.workspaceId,
+      message: `${displayNameForProfile(session.profileId)} managed session stopped (${reason}) in ${session.workspaceName}`,
+      affectedCardIds: [managedCardId(session.id)],
+      details: sessionEventDetails(session, "stop", reason)
+    });
+  }
+
   public evaluateAutomation(sessions: AutomatableSession[]): void {
     for (const event of this.automation.evaluateSessions(sessions)) {
       this.recordAutomationEvent(event);
@@ -489,7 +503,7 @@ function createDefaultSetupSummary(): DesktopSetupSummary {
   return {
     vscodeExtension: {
       extensionId: "adamgoodwin.perpetual-context-protection-automation",
-      expectedVersion: "0.0.1",
+      expectedVersion: "0.0.2",
       installed: false,
       checkedLocations: [],
       installCommand: "npm run vscode:install",

@@ -2,7 +2,7 @@
   "name": "perpetual-context-protection-automation",
   "displayName": "Perpetual Context Protection Automation",
   "description": "Desktop operator app, VS Code companion extension, and local bridge for managed AI coding sessions.",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "private": true,
   "publisher": "adamgoodwin",
   "license": "UNLICENSED",

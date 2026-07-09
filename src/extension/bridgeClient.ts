@@ -40,9 +40,15 @@ export class BridgeClient {
     );
   }
 
+  public async stopSession(sessionId: string): Promise<void> {
+    await this.request(`/sessions/${encodeURIComponent(sessionId)}`, {
+      method: "DELETE"
+    });
+  }
+
   private async request<T = unknown>(
     path: string,
-    options: { method: "GET" | "POST"; body?: unknown }
+    options: { method: "GET" | "POST" | "DELETE"; body?: unknown }
   ): Promise<T> {
     const response = await fetch(new URL(path, this.baseUrl), {
       method: options.method,

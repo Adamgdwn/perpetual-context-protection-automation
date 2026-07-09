@@ -371,6 +371,47 @@ void test("stale window heartbeats are pruned from desktop state", async () => {
   }
 });
 
+void test("deleting a managed session stops it, removes the card, and logs a stop", async () => {
+  const runtime = await startBridgeServer({ port: 0 });
+  try {
+    const heartbeat = createHeartbeat("del-window", "del-workspace", "Delete Workspace", []);
+    await postJson(`${runtime.url}/heartbeat`, heartbeat);
+    const session = await postJson<BridgeSessionSummary>(`${runtime.url}/sessions`, {
+      profileId: "echo-proof",
+      workspace: heartbeat.workspace
+    });
+
+    const before = await getJson<DesktopStateResponse>(`${runtime.url}/desktop/state`);
+    assert.equal(
+      before.cards.some((card) => card.source === "managed-session"),
+      true
+    );
+
+    const deleted = await fetch(`${runtime.url}/sessions/${session.id}`, {
+      method: "DELETE"
+    });
+    assert.equal(deleted.status, 200);
+
+    // Deleting again is a clean 404, not a crash.
+    const deletedAgain = await fetch(`${runtime.url}/sessions/${session.id}`, {
+      method: "DELETE"
+    });
+    assert.equal(deletedAgain.status, 404);
+
+    const after = await getJson<DesktopStateResponse>(`${runtime.url}/desktop/state`);
+    assert.equal(after.connection.sessionCount, 0);
+    assert.equal(
+      after.cards.some((card) => card.source === "managed-session"),
+      false
+    );
+    const details = after.events.flatMap((event) => event.details ?? []);
+    assert.equal(details.includes(`session:${session.id}`), true);
+    assert.equal(details.includes("action:stop"), true);
+  } finally {
+    await runtime.close();
+  }
+});
+
 function createHeartbeat(
   windowId: string,
   workspaceId: string,

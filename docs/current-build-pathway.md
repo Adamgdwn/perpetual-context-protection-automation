@@ -535,6 +535,7 @@ Implementation evidence:
 - 2026-06-30T10:32:05-06:00: Applied Guided AI Labs desktop branding, added the Signal Spark mark to the desktop header, refreshed the public GitHub README with screenshots and use instructions, and updated the living docs plus 01 Work Tracking ledger for a clean pause point.
 - 2026-06-30T10:32:05-06:00: Validation for the branded/docs pass included `npm run compile`, `npm run lint`, `npm run build`, `npm run desktop:smoke`, `npm test`, `git diff --check`, and a Markdown render check.
 - 2026-07-09T06:34:07-06:00: Live-testing prep surfaced a window-collapse defect: the running instance showed three heart-beating VS Code workspaces as a single card with `heartbeatCount:1`. Root cause was the companion extension persisting its `windowId` in `context.globalState` (shared across all windows of an install). Fixed by minting a distinct per-window id at activation, plus bridge staleness pruning (30s) so closed/reloaded windows stop leaving ghost cards. Added two bridge regression tests. Note: `npm run desktop:smoke` must run with `ELECTRON_RUN_AS_NODE` unset; the automation harness sets it to `1`, which makes Electron run as plain Node and the smoke fail spuriously.
+- 2026-07-09T07:17:00-06:00: During the same session the running desktop app crashed, which orphaned a managed VS Code terminal that could not be killed from inside (its bridge was gone and the app's Kill control died with it). Recovered by relaunching the desktop app. Added an in-terminal kill path so operators are not dependent on the desktop app to stop a managed session: double-Escape stops the bridge session and closes the terminal (single Escape still passes through as an agent interrupt), and closing the terminal now stops the session too via a new `DELETE /sessions/:id` bridge endpoint. Bumped the companion extension to 0.0.2. This activates per VS Code window on reload; already-running windows keep the prior behavior until reloaded.
 
 Close-out state: Task complete for the Linux companion install/setup and public
 documentation prep slices. Chunk Six is paused, not release ready. It remains
@@ -695,6 +696,12 @@ sole reason to inject text.
 | 2026-07-09T06:34:07-06:00 | `npm test` | pass | 23 unit tests, including new distinct-window and stale-heartbeat pruning coverage. |
 | 2026-07-09T06:34:07-06:00 | `npm run build` | pass | TypeScript compile and desktop renderer production build passed. |
 | 2026-07-09T06:34:07-06:00 | `env -u ELECTRON_RUN_AS_NODE npm run desktop:smoke` | pass | Electron rendered the desktop shell and Operator Guide; exit 0. Fails only when the harness `ELECTRON_RUN_AS_NODE=1` is left set. |
+| 2026-07-09T07:17:00-06:00 | `npm run lint` | pass | ESLint clean after in-terminal kill path + version bump. |
+| 2026-07-09T07:17:00-06:00 | `npm test` | pass | 29 unit tests, including double-Escape detector and `DELETE /sessions/:id` coverage. |
+| 2026-07-09T07:17:00-06:00 | `npm run build` | pass | TypeScript compile and desktop renderer production build passed. |
+| 2026-07-09T07:17:00-06:00 | `env -u ELECTRON_RUN_AS_NODE npm run desktop:smoke` | pass | Desktop shell + Operator Guide rendered; exit 0. |
+| 2026-07-09T07:17:00-06:00 | `env -u ELECTRON_RUN_AS_NODE npm run test:vscode` | pass | VS Code 1.128.0 extension host activated and exited 0. |
+| 2026-07-09T07:17:00-06:00 | live bridge `DELETE /sessions/:id` + OPTIONS check | pass | Restarted desktop app exposes the stop-session route (404 on unknown id) and advertises DELETE in CORS. |
 
 ## Next Handoff
 

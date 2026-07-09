@@ -2,6 +2,15 @@
 
 ## Unreleased
 
+- 2026-07-09: Added an in-terminal kill path for managed sessions and bumped the
+  companion extension to 0.0.2. Pressing Escape twice in a managed PCPA terminal
+  now stops the bridge session and closes the terminal; a single Escape still
+  passes through to the agent as an interrupt. Closing the terminal (trash icon)
+  now also stops the bridge session instead of leaving it running headless — the
+  extension calls a new `DELETE /sessions/:id` bridge endpoint, which stops the
+  pty, removes the session, and records a stop event in the append-only log.
+  Added a pure double-Escape detector with unit tests and a bridge test for the
+  delete endpoint.
 - 2026-07-09: Fixed a window-collapse defect found during live-testing prep.
   The companion extension previously persisted its `windowId` in
   `context.globalState`, which VS Code shares across every window of an install,
