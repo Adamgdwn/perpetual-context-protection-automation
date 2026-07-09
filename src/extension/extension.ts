@@ -23,7 +23,7 @@ export function activate(context: vscode.ExtensionContext): void {
   const output = vscode.window.createOutputChannel("Perpetual Context Protection");
   context.subscriptions.push(output);
 
-  const windowId = loadWindowId(context);
+  const windowId = createWindowId();
 
   const sendHeartbeat = async (): Promise<ExtensionHeartbeat> => {
     const heartbeat = createHeartbeat(context, windowId);
@@ -226,15 +226,13 @@ function createTerminalSummaries(): TerminalSummary[] {
   return [...managed, ...unmanagedTerminals];
 }
 
-function loadWindowId(context: vscode.ExtensionContext): string {
-  const existing = context.globalState.get<string>("pcpa.windowId");
-  if (existing) {
-    return existing;
-  }
-
-  const created = randomUUID();
-  void context.globalState.update("pcpa.windowId", created);
-  return created;
+// Each VS Code window runs its own extension host, so `activate` runs once per
+// window. Minting the id here gives every window a distinct identity for its
+// lifetime. Persisting it in `context.globalState` (as an earlier version did)
+// was wrong: globalState is shared across all windows of an install, so every
+// window reported the same id and the bridge collapsed them into one card.
+function createWindowId(): string {
+  return randomUUID();
 }
 
 function createBridgeClient(): BridgeClient {

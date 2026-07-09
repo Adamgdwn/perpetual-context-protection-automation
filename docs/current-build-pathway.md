@@ -534,6 +534,7 @@ Implementation evidence:
 - 2026-06-29T22:30:16-06:00: Night closeout handoff recorded. Adam has seen proof of life in the desktop app; next work starts with Adam-observed live testing, including dry-run first, then live mode only against a clearly managed and armable disposable session.
 - 2026-06-30T10:32:05-06:00: Applied Guided AI Labs desktop branding, added the Signal Spark mark to the desktop header, refreshed the public GitHub README with screenshots and use instructions, and updated the living docs plus 01 Work Tracking ledger for a clean pause point.
 - 2026-06-30T10:32:05-06:00: Validation for the branded/docs pass included `npm run compile`, `npm run lint`, `npm run build`, `npm run desktop:smoke`, `npm test`, `git diff --check`, and a Markdown render check.
+- 2026-07-09T06:34:07-06:00: Live-testing prep surfaced a window-collapse defect: the running instance showed three heart-beating VS Code workspaces as a single card with `heartbeatCount:1`. Root cause was the companion extension persisting its `windowId` in `context.globalState` (shared across all windows of an install). Fixed by minting a distinct per-window id at activation, plus bridge staleness pruning (30s) so closed/reloaded windows stop leaving ghost cards. Added two bridge regression tests. Note: `npm run desktop:smoke` must run with `ELECTRON_RUN_AS_NODE` unset; the automation harness sets it to `1`, which makes Electron run as plain Node and the smoke fail spuriously.
 
 Close-out state: Task complete for the Linux companion install/setup and public
 documentation prep slices. Chunk Six is paused, not release ready. It remains
@@ -689,6 +690,11 @@ sole reason to inject text.
 | 2026-06-29T22:17:36-06:00 | `npm run desktop:smoke` | pass | Electron smoke opened the operator-guide drawer and confirmed `Operator Guide` content; headless DBus warnings only. |
 | 2026-06-29T22:18:35-06:00 | `git diff --check` | pass | No whitespace errors in the final diff. |
 | 2026-06-29T22:18:35-06:00 | `graphify update . --no-cluster` | pass | Repo graph refresh completed without clustering; 728 nodes and 10075 edges. |
+| 2026-07-09T06:34:07-06:00 | `bash scripts/governance-preflight.sh` | pass | Window-collapse fix passed preflight with 0 warnings. |
+| 2026-07-09T06:34:07-06:00 | `npm run lint` | pass | ESLint passed for source, tests, and Vite config. |
+| 2026-07-09T06:34:07-06:00 | `npm test` | pass | 23 unit tests, including new distinct-window and stale-heartbeat pruning coverage. |
+| 2026-07-09T06:34:07-06:00 | `npm run build` | pass | TypeScript compile and desktop renderer production build passed. |
+| 2026-07-09T06:34:07-06:00 | `env -u ELECTRON_RUN_AS_NODE npm run desktop:smoke` | pass | Electron rendered the desktop shell and Operator Guide; exit 0. Fails only when the harness `ELECTRON_RUN_AS_NODE=1` is left set. |
 
 ## Next Handoff
 

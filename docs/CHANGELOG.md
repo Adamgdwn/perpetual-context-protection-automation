@@ -2,6 +2,15 @@
 
 ## Unreleased
 
+- 2026-07-09: Fixed a window-collapse defect found during live-testing prep.
+  The companion extension previously persisted its `windowId` in
+  `context.globalState`, which VS Code shares across every window of an install,
+  so all open windows reported the same id and the bridge collapsed them into a
+  single card (the operator could not tell windows apart or pick one). The
+  extension now mints a distinct per-window id at activation, and the bridge
+  prunes heartbeats older than 30s so closed or reloaded windows drop off instead
+  of lingering as ghost cards. Added bridge regression tests for distinct-window
+  cards and stale-heartbeat pruning.
 - 2026-06-30: Closed the current documentation chunk as paused, not release
   ready. `START_HERE.md`, `docs/current-build-pathway.md`, README, manual,
   runbook, deployment guide, roadmap, architecture note, domain language, risk

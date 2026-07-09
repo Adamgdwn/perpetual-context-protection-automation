@@ -40,6 +40,13 @@ interface BridgeState {
 export const DEFAULT_BRIDGE_HOST = "127.0.0.1";
 export const DEFAULT_BRIDGE_PORT = 47320;
 
+// A window is considered gone once it misses several heartbeats. The default
+// heartbeat interval is 10s, so 30s tolerates a couple of missed beats before a
+// closed or reloaded VS Code window drops off the desktop. Because each window
+// now has a distinct id, pruning is what keeps stale windows from lingering as
+// ghost cards.
+export const HEARTBEAT_STALE_AFTER_MS = 30_000;
+
 export async function startBridgeServer(
   options: BridgeServerOptions = {}
 ): Promise<BridgeRuntime> {
@@ -285,10 +292,20 @@ function desktopInput(state: BridgeState): {
   heartbeats: ExtensionHeartbeat[];
   sessions: ReturnType<ManagedPtySession["summary"]>[];
 } {
+  pruneStaleHeartbeats(state, Date.now());
   return {
     heartbeats: [...state.heartbeats.values()],
     sessions: [...state.sessions.values()].map((session) => session.summary())
   };
+}
+
+function pruneStaleHeartbeats(state: BridgeState, nowMs: number): void {
+  for (const [windowId, heartbeat] of state.heartbeats) {
+    const beatMs = Date.parse(heartbeat.timestamp);
+    if (!Number.isNaN(beatMs) && nowMs - beatMs > HEARTBEAT_STALE_AFTER_MS) {
+      state.heartbeats.delete(windowId);
+    }
+  }
 }
 
 function sendDesktopAction(

@@ -312,6 +312,65 @@ void test("desktop controls isolate multiple managed sessions", async () => {
   }
 });
 
+void test("distinct VS Code windows stay as separate cards keyed by window id", async () => {
+  const runtime = await startBridgeServer({ port: 0 });
+  try {
+    // Two windows open on the same workspace must not collapse into one card.
+    // Before the extension minted a per-window id, every window shared one id
+    // and overwrote a single heartbeat slot.
+    const windowOne = createHeartbeat("window-a", "shared-workspace", "Shared Workspace", []);
+    const windowTwo = createHeartbeat("window-b", "shared-workspace", "Shared Workspace", []);
+
+    await postJson(`${runtime.url}/heartbeat`, windowOne);
+    await postJson(`${runtime.url}/heartbeat`, windowTwo);
+
+    const twoWindows = await getJson<DesktopStateResponse>(`${runtime.url}/desktop/state`);
+    const workspaceCards = twoWindows.cards.filter((card) => card.source === "workspace");
+    assert.equal(twoWindows.connection.heartbeatCount, 2);
+    assert.equal(workspaceCards.length, 2);
+    assert.deepEqual(
+      new Set(workspaceCards.map((card) => card.windowId)),
+      new Set(["window-a", "window-b"])
+    );
+
+    // Re-posting an existing window id updates that window rather than adding a
+    // new card, which is exactly why the extension must send a stable-but-unique
+    // id per window.
+    await postJson(`${runtime.url}/heartbeat`, windowOne);
+    const afterUpdate = await getJson<DesktopStateResponse>(`${runtime.url}/desktop/state`);
+    assert.equal(afterUpdate.connection.heartbeatCount, 2);
+  } finally {
+    await runtime.close();
+  }
+});
+
+void test("stale window heartbeats are pruned from desktop state", async () => {
+  const runtime = await startBridgeServer({ port: 0 });
+  try {
+    const fresh = createHeartbeat("window-fresh", "fresh-workspace", "Fresh Workspace", []);
+    const stale: ExtensionHeartbeat = {
+      ...createHeartbeat("window-stale", "stale-workspace", "Stale Workspace", []),
+      timestamp: new Date(Date.now() - 60_000).toISOString()
+    };
+
+    await postJson(`${runtime.url}/heartbeat`, fresh);
+    await postJson(`${runtime.url}/heartbeat`, stale);
+
+    const state = await getJson<DesktopStateResponse>(`${runtime.url}/desktop/state`);
+    assert.equal(state.connection.heartbeatCount, 1);
+    assert.equal(
+      state.cards.some((card) => card.windowId === "window-stale"),
+      false
+    );
+    assert.equal(
+      state.cards.some((card) => card.windowId === "window-fresh"),
+      true
+    );
+  } finally {
+    await runtime.close();
+  }
+});
+
 function createHeartbeat(
   windowId: string,
   workspaceId: string,
