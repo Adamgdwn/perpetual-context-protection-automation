@@ -2,6 +2,13 @@
 
 ## Unreleased
 
+- 2026-07-09: Scope decision - kept the managed-session design at its current
+  shape. Evaluated a dashboard-driven "launch a terminal into a chosen VS Code
+  window" enhancement (feasible via a bridge->window command channel on the
+  existing heartbeat) and deliberately declined it to avoid overcomplexity. The
+  one manual launch-from-VS-Code step stays; the dashboard remains the
+  supervise/auto-compact control plane. Next planned work is an Adam-observed
+  watched acceptance test on the current build before Windows packaging.
 - 2026-07-09: Fixed clipped output in managed agent terminals. The pty was
   spawned at a fixed 100x30 grid and never resized, so a full-screen TUI agent
   (Codex, Claude) drew its input box and status lines outside a shorter terminal

@@ -1,8 +1,44 @@
 # Start Here
 
-Last Updated: 2026-06-30T10:32:05-06:00
-Status: Documentation closeout complete - paused before live testing and Windows packaging
+Last Updated: 2026-07-09T22:26:32-06:00
+Status: At testing gate - design frozen at current shape; next is Adam-observed watched acceptance test
 Owner: Adam Goodwin
+
+## 2026-07-09 Night Closeout - Start Here Tomorrow
+
+Read this section, run `git status --short`, and you have everything to resume.
+No open blockers. No code changes are pending. The build is at the testing gate.
+
+Design decision (do not reopen without Adam): the current shape is frozen. Adam
+declined the dashboard-driven "launch a terminal into a chosen VS Code window"
+enhancement to avoid overcomplexity. Keep the one manual launch-from-VS-Code
+step; everything after it (arm, auto-compact, pause, resume, kill) stays on the
+dashboard. The feasibility answer, if it ever comes back up: it is possible via a
+bridge->window command channel riding the existing heartbeat, but it was
+intentionally not built.
+
+The only remaining work to call this "genuinely works": one Adam-observed,
+five-step watched acceptance test on the CURRENT build, run in a fresh throwaway
+VS Code window so the two live Codex sessions are never touched:
+
+1. Launch: command palette -> "PCPA: Start Managed Codex". The terminal opens and
+   shows full output (proves the 2026-07-09 resize fix).
+2. The session appears on the dashboard as its own card in the right workspace.
+3. Arm it, set live mode, drive the agent to a chunk boundary.
+4. Watch `/compact` fire on its own and the agent resume. <- this is the product.
+5. Stop three ways, each clean with no ghost card: dashboard kill, `Esc Esc` in
+   the terminal, and the terminal trash icon.
+
+If all five hold, record the evidence in `docs/current-build-pathway.md`; the
+build is then ready for Windows packaging. If any step stumbles, that is the real
+bug list and takes priority over new code.
+
+Optional frictionless prep (neither step disturbs the live sessions):
+- Repackage/install the latest extension so a fresh window has the newest fixes:
+  `npm run vscode:package` then `npm run vscode:install`.
+- The two live managed Codex sessions (started ~2026-07-09 23:58/23:59 in the
+  Guided AI Journey window) run the pre-fix build. They keep working but do not
+  exercise the newest code until that window is reloaded, which Adam is deferring.
 
 ## 2026-06-29 Chunk Zero Completion Handoff
 
