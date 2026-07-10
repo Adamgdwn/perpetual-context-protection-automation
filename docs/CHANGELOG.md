@@ -2,6 +2,14 @@
 
 ## Unreleased
 
+- 2026-07-09: Fixed clipped output in managed agent terminals. The pty was
+  spawned at a fixed 100x30 grid and never resized, so a full-screen TUI agent
+  (Codex, Claude) drew its input box and status lines outside a shorter terminal
+  panel and appeared to "not show all the text." The companion terminal now
+  forwards the real terminal dimensions to the bridge on open and on every
+  resize (`POST /sessions/:id/resize`), and the bridge resizes the live pty so
+  the agent draws to the terminal the operator actually sees. Added a bridge
+  test for the resize endpoint (valid, invalid, and unknown-session cases).
 - 2026-07-09: Added an in-terminal kill path for managed sessions and bumped the
   companion extension to 0.0.2. Pressing Escape twice in a managed PCPA terminal
   now stops the bridge session and closes the terminal; a single Escape still

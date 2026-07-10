@@ -8,6 +8,8 @@ export class BridgeManagedPseudoterminal implements vscode.Pseudoterminal {
   private pollHandle: NodeJS.Timeout | undefined;
   private lastOutputLength = 0;
   private lastEscapeAt = 0;
+  private lastCols = 0;
+  private lastRows = 0;
   private disposed = false;
 
   public readonly onDidWrite = this.writeEmitter.event;
@@ -18,13 +20,25 @@ export class BridgeManagedPseudoterminal implements vscode.Pseudoterminal {
     private readonly sessionId: string
   ) {}
 
-  public open(): void {
+  public open(initialDimensions: vscode.TerminalDimensions | undefined): void {
     this.writeEmitter.fire("Connected to managed PCPA bridge session.\r\n");
     this.writeEmitter.fire("Press Esc twice to stop this managed session.\r\n");
+    // The pty was spawned at a default size before this terminal existed. Send
+    // the real dimensions now so the agent's full-screen UI fits the terminal
+    // the operator sees instead of being clipped to a stale 100x30 grid.
+    if (initialDimensions) {
+      this.sendResize(initialDimensions);
+    }
     this.pollHandle = setInterval(() => {
       void this.pollOutput();
     }, 250);
     void this.pollOutput();
+  }
+
+  // VS Code calls this whenever the terminal panel is resized (or first laid
+  // out). Forward the new size so the pty tracks what the operator sees.
+  public setDimensions(dimensions: vscode.TerminalDimensions): void {
+    this.sendResize(dimensions);
   }
 
   // Invoked by VS Code when the terminal is closed (e.g. the trash icon). Stop
@@ -74,6 +88,23 @@ export class BridgeManagedPseudoterminal implements vscode.Pseudoterminal {
     if (closeTerminal) {
       this.closeEmitter.fire();
     }
+  }
+
+  // Forward a terminal size to the bridge, skipping no-op repeats (VS Code fires
+  // setDimensions on every layout pass). A failed resize is best-effort: it must
+  // not tear down the terminal, so the error is swallowed.
+  private sendResize(dimensions: vscode.TerminalDimensions): void {
+    const cols = Math.max(1, Math.floor(dimensions.columns));
+    const rows = Math.max(1, Math.floor(dimensions.rows));
+    if (cols === this.lastCols && rows === this.lastRows) {
+      return;
+    }
+
+    this.lastCols = cols;
+    this.lastRows = rows;
+    void this.client.resizeSession(this.sessionId, cols, rows).catch(() => {
+      // Bridge may be gone or the session already stopped; ignore.
+    });
   }
 
   private async pollOutput(): Promise<void> {

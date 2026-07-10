@@ -102,6 +102,11 @@ export interface SendInputRequest {
   text: string;
 }
 
+export interface ResizeSessionRequest {
+  cols: number;
+  rows: number;
+}
+
 export interface BridgeSessionSummary {
   id: string;
   profileId: AgentProfileId;

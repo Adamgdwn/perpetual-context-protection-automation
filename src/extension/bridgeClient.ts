@@ -1,6 +1,7 @@
 import type {
   BridgeSessionSummary,
   ExtensionHeartbeat,
+  ResizeSessionRequest,
   SendInputRequest,
   SessionOutputResponse,
   StartSessionRequest
@@ -38,6 +39,18 @@ export class BridgeClient {
       `/sessions/${encodeURIComponent(sessionId)}/output`,
       { method: "GET" }
     );
+  }
+
+  public async resizeSession(
+    sessionId: string,
+    cols: number,
+    rows: number
+  ): Promise<void> {
+    const body: ResizeSessionRequest = { cols, rows };
+    await this.request(`/sessions/${encodeURIComponent(sessionId)}/resize`, {
+      method: "POST",
+      body
+    });
   }
 
   public async stopSession(sessionId: string): Promise<void> {

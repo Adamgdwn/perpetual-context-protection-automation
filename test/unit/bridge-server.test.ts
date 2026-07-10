@@ -412,6 +412,41 @@ void test("deleting a managed session stops it, removes the card, and logs a sto
   }
 });
 
+void test("resizing a managed session accepts valid dimensions and rejects bad ones", async () => {
+  const runtime = await startBridgeServer({ port: 0 });
+  try {
+    const heartbeat = createHeartbeat("resize-window", "resize-workspace", "Resize Workspace", []);
+    await postJson(`${runtime.url}/heartbeat`, heartbeat);
+    const session = await postJson<BridgeSessionSummary>(`${runtime.url}/sessions`, {
+      profileId: "echo-proof",
+      workspace: heartbeat.workspace
+    });
+
+    // A real terminal size is forwarded to the pty without error.
+    const resized = await postJsonResponse(
+      `${runtime.url}/sessions/${session.id}/resize`,
+      { cols: 132, rows: 43 }
+    );
+    assert.equal(resized.status, 200);
+
+    // Non-integer dimensions are rejected before reaching the pty.
+    const invalid = await postJsonResponse(
+      `${runtime.url}/sessions/${session.id}/resize`,
+      { cols: "wide", rows: 43 }
+    );
+    assert.equal(invalid.status, 400);
+
+    // Resizing an unknown session is a clean 404, not a crash.
+    const missing = await postJsonResponse(
+      `${runtime.url}/sessions/does-not-exist/resize`,
+      { cols: 80, rows: 24 }
+    );
+    assert.equal(missing.status, 404);
+  } finally {
+    await runtime.close();
+  }
+});
+
 function createHeartbeat(
   windowId: string,
   workspaceId: string,

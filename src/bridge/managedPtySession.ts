@@ -73,6 +73,23 @@ export class ManagedPtySession {
     });
   }
 
+  // Update the pty size so full-screen TUI agents (Codex, Claude) draw to the
+  // terminal the operator actually sees. The pty is spawned before the VS Code
+  // terminal opens, so it starts at a default size; the extension forwards the
+  // real dimensions on open and on every resize. Invalid dimensions are ignored
+  // rather than thrown so a stray resize cannot crash the session.
+  public resize(cols: number, rows: number): void {
+    if (!Number.isInteger(cols) || !Number.isInteger(rows) || cols < 1 || rows < 1) {
+      return;
+    }
+
+    this.options.cols = cols;
+    this.options.rows = rows;
+    if (this.process && this.status !== "exited") {
+      this.process.resize(cols, rows);
+    }
+  }
+
   public write(data: string): void {
     if (!this.process || this.status === "exited") {
       throw new Error(`Managed session ${this.id} is not running`);

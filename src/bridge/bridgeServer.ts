@@ -8,6 +8,7 @@ import {
   type DesktopActionResponse,
   type DesktopStateResponse,
   type ExtensionHeartbeat,
+  type ResizeSessionRequest,
   type SendInputRequest,
   type SessionAutomationMode,
   type StartSessionRequest
@@ -194,6 +195,23 @@ async function handleRequest(
       }
       session.write(body.text);
       state.desktop.recordSessionInput(session.summary());
+      sendJson(response, 200, { ok: true });
+      return;
+    }
+
+    const resizeMatch = url.pathname.match(/^\/sessions\/([^/]+)\/resize$/u);
+    if (request.method === "POST" && resizeMatch) {
+      const session = state.sessions.get(resizeMatch[1]);
+      if (!session) {
+        sendJson(response, 404, { ok: false, error: "Session not found" });
+        return;
+      }
+      const body = await readJson<ResizeSessionRequest>(request);
+      if (!Number.isInteger(body.cols) || !Number.isInteger(body.rows)) {
+        sendJson(response, 400, { ok: false, error: "Invalid resize request" });
+        return;
+      }
+      session.resize(body.cols, body.rows);
       sendJson(response, 200, { ok: true });
       return;
     }
